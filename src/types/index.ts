@@ -19,12 +19,14 @@ export interface PetRecord {
   bountyEscrowPda?: string;
   lastSeenLocation?: string;
   city?: string;
+  lat?: number;
+  lng?: number;
   lastSeenDate?: string;
   timeElapsed?: string;
   distinctiveFeatures?: string;
   contactNote?: string;
   medicalUrgent?: boolean;
-  coordinates?: { x: number; y: number }; // Radar percentage coordinates (0 to 100)
+  coordinates?: { x: number; y: number };
   createdAt: number;
   qrCodeUrl?: string;
   claims?: ClaimRecord[];
