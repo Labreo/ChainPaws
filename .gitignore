@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Rust & Solana / Anchor build artifacts
+target/
+.anchor/
+test-ledger/
+**/*.so
+**/*.dylib
+**/*.dll
+
+# Solana keypairs & secret keys (NEVER COMMIT KEYS)
+*.json
+!package.json
+!tsconfig.json
+!components.json
+!theme.json
+!anchor/Anchor.toml
+!idl.json
+!**/*idl*.json
+!**/*schema*.json
+id.json
+deploy-keypair.json
+*-keypair.json
+*.key
+*.pem
+
+# Environment Variables & Secrets
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs & caches
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.turbo
+.cache
+*.log
+
+# Operating System & IDE Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+scratch/
+tmp/
+temp/
