@@ -11,6 +11,8 @@ import {
   ShieldAlert,
   MapPin,
   Clock,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { PetRecord } from '@/types';
 import { playSound } from '@/lib/sound';
@@ -22,74 +24,7 @@ interface EmergencyFlyerModalProps {
 
 type SupportedLanguage = 'en' | 'es' | 'fr' | 'zh' | 'ja';
 
-// Multilingual translations database for pet distinctive features
-const FEATURE_TRANSLATIONS: Record<string, Record<SupportedLanguage, string>> = {
-  'pet-001': { // Atlas
-    en: 'Wearing red reflective harness. Distinctive wolf mask markings, friendly but fast runner.',
-    es: 'Lleva arnés reflectante rojo. Marcas faciales distintivas de lobo, muy amigable pero corre rápido.',
-    fr: 'Porte un harnais réfléchissant rouge. Masque facial distinctif de loup, très amical mais rapide.',
-    zh: '佩戴红色反光胸背带。独特的狼面斑纹，性格温顺亲人，奔跑迅速。',
-    ja: '赤い反射ハーネス着用。特徴的なオオカミ柄の顔立ち、人懐っこいですが走るのが速いです。',
-  },
-  'pet-002': { // Kobe
-    en: 'Wearing teal collar with stainless tag. Loves chasing tennis balls, answers to Kobe.',
-    es: 'Lleva collar verde azulado con placa de acero. Le encanta perseguir pelotas de tenis, responde a Kobe.',
-    fr: 'Porte un collier turquoise avec médaille inox. Adore courir après les balles de tennis, répond à Kobe.',
-    zh: '佩戴青色项圈配不锈钢标牌。喜欢追网球，呼唤Kobe有反应。',
-    ja: 'ティール色の首輪とステンレス迷子札着用。テニスボール遊びが大好きで、「コービー」と呼ぶと反応します。',
-  },
-  'pet-003': { // Mochi
-    en: 'Folded ears, large owl-like copper eyes, bell collar. Very timid with strangers.',
-    es: 'Orejas plegadas, grandes ojos cobrizos, collar con cascabel. Muy tímido con extraños.',
-    fr: 'Oreilles pliées, grands yeux cuivrés, collier à clochette. Très timide avec les inconnus.',
-    zh: '折耳，猫头鹰般的大铜眼，带有小铃铛项圈。见陌生人比较胆小。',
-    ja: '折れ耳、フクロウのような大きな琥珀色の瞳、鈴付きの首輪。人見知りしやすい性格です。',
-  },
-  'pet-004': { // Ziggy
-    en: 'Intense amber eyes, white chest blaze and paws, blue nylon collar. Highly energetic and responsive to whistles.',
-    es: 'Ojos ámbar intensos, mancha blanca en pecho y patas, collar de nylon azul. Muy enérgico y responde a silbidos.',
-    fr: 'Yeux ambrés intenses, poitrail et pattes blancs, collier en nylon bleu. Très dynamique et obéissant au sifflet.',
-    zh: '清澈琥珀色眼睛，胸前与爪子有白斑，戴蓝色尼龙项圈。精力充沛，对哨声有灵敏反应。',
-    ja: '鮮やかな琥珀色の瞳、胸元と足先が白い毛並み、青いナイロン首輪。元気いっぱいで口笛に反応します。',
-  },
-  'pet-005': { // Rex
-    en: 'Large scar over left shoulder, leather collar with silver rivets. Loyal family dog, responds to hand signals.',
-    es: 'Cicatriz en el hombro izquierdo, collar de cuero con remaches. Perro leal, responde a señas con la mano.',
-    fr: 'Grande cicatrice sur l\'épaule gauche, collier en cuir clouté. Chien fidèle, réactif aux gestes.',
-    zh: '左肩有明显疤痕，皮质铆钉项圈。忠诚亲人，对常用手势口令有良好反应。',
-    ja: '左肩に傷跡あり、シルバーリベット付き革首輪。忠実な家族犬で、ハンドサインに反応します。',
-  },
-  'pet-006': { // Luna
-    en: 'Cream French Bulldog with black mask, lilac harness. Snorts when excited, loves people.',
-    es: 'Bulldog francés crema con máscara negra, arnés lila. Resopla cuando está emocionada, muy cariñosa.',
-    fr: 'Bouledogue français crème à masque noir, harnais lilas. Renifle quand elle est excitée, adore les gens.',
-    zh: '奶油色法国斗牛犬带黑面罩，淡紫色胸背带。兴奋时会打呼噜，极度喜欢人类。',
-    ja: 'ブラックマスクのクリーム色フレンチブルドッグ、薄紫色のハーネス。興奮すると鼻を鳴らします。人が大好きです。',
-  },
-  'pet-007': { // Bear
-    en: 'Chocolate coat with golden undertones, service vest patch removed. Extremely gentle giant.',
-    es: 'Pelaje chocolate con reflejos dorados. Perro gigante extremadamente dócil y gentil.',
-    fr: 'Pelage chocolat aux reflets dorés. Chien géant extrêmement doux et calme.',
-    zh: '深巧克力色毛发泛金光。性格极其温顺的大型犬。',
-    ja: '光沢のあるチョコレート色の毛並み。とても穏やかで優しい性格の大型犬です。',
-  },
-  'pet-008': { // Coco
-    en: 'Tiny frame (4 lbs), feathery ears, pink rhinestone collar. Needs heart medication.',
-    es: 'Tamaño muy pequeño (2 kg), orejas plumosas, collar rosa con pedrería. Requiere medicación cardíaca.',
-    fr: 'Très petite taille (2 kg), oreilles frangées, collier rose à strass. A besoin de médicaments cardiaques.',
-    zh: '娇小体型（约2公斤），羽状长耳，佩戴粉色水钻项圈。需要按时服用心脏药物。',
-    ja: '体重約2kgの超小型犬、フサフサの飾り毛のある耳、ピンクのラインストーン首輪。心臓病の薬が毎日必要です。',
-  },
-  'pet-009': { // Milo
-    en: 'Tri-color pattern with white socks, blue bandana. Very food-motivated and quick to follow treats.',
-    es: 'Patrón tricolor con patas blancas, bandana azul. Le motiva mucho la comida y sigue golosinas.',
-    fr: 'Robe tricolore avec pattes blanches, bandana bleu. Très gourmand et obéit aux friandises.',
-    zh: '三色毛发配白袜爪，戴蓝色三角巾。对食物极度敏感，容易被零食吸引。',
-    ja: '足先が白いトライカラーの毛並み、青いバンダナ着用。食いしん坊でおやつによく反応します。',
-  },
-};
-
-const TRANSLATIONS: Record<SupportedLanguage, {
+const UI_TRANSLATIONS: Record<SupportedLanguage, {
   headerTitle: string;
   title: string;
   isoLabel: string;
@@ -104,6 +39,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
   voiceButton: (langName: string) => string;
   stopVoiceButton: string;
   printButton: string;
+  aiBadge: string;
   speechText: (name: string, breed: string, city: string, reward: number) => string;
 }> = {
   en: {
@@ -121,6 +57,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
     voiceButton: (lang) => `Play Voice Siren (${lang})`,
     stopVoiceButton: 'Stop Broadcast',
     printButton: 'Print Emergency Flyer',
+    aiBadge: 'AI Multilingual Engine',
     speechText: (name, breed, city, reward) =>
       `Emergency missing companion alert. A ${breed} named ${name} was last seen in ${city}. A verified escrow reward of ${reward} SOL is locked on the Solana blockchain for their safe return. Please scan the QR tag or notify authorities immediately.`,
   },
@@ -139,6 +76,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
     voiceButton: (lang) => `Reproducir Sirena (${lang})`,
     stopVoiceButton: 'Detener Emisión',
     printButton: 'Imprimir Cartel de Emergencia',
+    aiBadge: 'Traducción Dinámica IA',
     speechText: (name, breed, city, reward) =>
       `Alerta de emergencia de mascota perdida. Un ${breed} llamado ${name} fue visto por última vez en ${city}. Hay una recompensa en custodia de ${reward} SOL en la cadena de bloques Solana para su regreso seguro.`,
   },
@@ -157,6 +95,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
     voiceButton: (lang) => `Diffuser l'Alerte Vocale (${lang})`,
     stopVoiceButton: 'Arrêter la Diffusion',
     printButton: 'Imprimer l\'Affiche d\'Urgence',
+    aiBadge: 'Traduction Dynamique IA',
     speechText: (name, breed, city, reward) =>
       `Alerte d'urgence pour animal disparu. Un ${breed} nommé ${name} a été vu pour la dernière fois à ${city}. Une récompense de ${reward} SOL est bloquée sur la blockchain Solana pour son retour en toute sécurité.`,
   },
@@ -175,6 +114,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
     voiceButton: (lang) => `播放语音警报 (${lang})`,
     stopVoiceButton: '停止广播',
     printButton: '打印紧急寻宠传单',
+    aiBadge: 'AI 智能多语言翻译',
     speechText: (name, breed, city, reward) =>
       `紧急寻宠通知。名为${name}的${breed}在${city}走失。已在Solana区块链锁定${reward}个SOL智能合约悬赏金。请扫描芯片二维码或联系救援。`,
   },
@@ -193,6 +133,7 @@ const TRANSLATIONS: Record<SupportedLanguage, {
     voiceButton: (lang) => `音声アラート再生 (${lang})`,
     stopVoiceButton: '音声を停止',
     printButton: '緊急捜索チラシを印刷',
+    aiBadge: 'AI リアルタイム自動翻訳',
     speechText: (name, breed, city, reward) =>
       `緊急迷子ペットアラート。${city}で迷子になった${breed}の${name}を探しています。Solana上で${reward}SOLの懸賞金が預託されています。見かけた方はQRスキャンをお願いします。`,
   },
@@ -202,6 +143,14 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
   const [lang, setLang] = useState<SupportedLanguage>('ja');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechSynth, setSpeechSynth] = useState<SpeechSynthesis | null>(null);
+
+  // Dynamic AI Translation state
+  const rawFeatures = pet.distinctiveFeatures || `${pet.breed} — ${pet.color}. Very friendly.`;
+  const [translatedFeatures, setTranslatedFeatures] = useState<string>(rawFeatures);
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [translationCache, setTranslationCache] = useState<Record<string, string>>({
+    [`en:${rawFeatures}`]: rawFeatures,
+  });
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -214,6 +163,49 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
     };
   }, []);
 
+  // Fetch dynamic AI translation whenever language changes
+  useEffect(() => {
+    if (lang === 'en') {
+      setTranslatedFeatures(rawFeatures);
+      return;
+    }
+
+    const cacheKey = `${lang}:${rawFeatures}`;
+    if (translationCache[cacheKey]) {
+      setTranslatedFeatures(translationCache[cacheKey]);
+      return;
+    }
+
+    let isMounted = true;
+    async function fetchDynamicTranslation() {
+      setIsTranslating(true);
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: rawFeatures, targetLang: lang }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data.translatedText) {
+            setTranslatedFeatures(data.translatedText);
+            setTranslationCache((prev) => ({ ...prev, [cacheKey]: data.translatedText }));
+          }
+        }
+      } catch (err) {
+        console.warn('Dynamic translation failed, using fallback:', err);
+      } finally {
+        if (isMounted) setIsTranslating(false);
+      }
+    }
+
+    fetchDynamicTranslation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [lang, rawFeatures, translationCache]);
+
   const handleToggleVoiceAlert = () => {
     if (!speechSynth) return;
 
@@ -224,7 +216,7 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
     }
 
     speechSynth.cancel();
-    const t = TRANSLATIONS[lang];
+    const t = UI_TRANSLATIONS[lang];
     const text = t.speechText(pet.name, pet.breed, pet.city || pet.lastSeenLocation || 'the area', pet.bountySol);
     const utterance = new SpeechSynthesisUtterance(text);
     
@@ -245,11 +237,8 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
     window.print();
   };
 
-  const t = TRANSLATIONS[lang];
+  const t = UI_TRANSLATIONS[lang];
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://chain-paws.vercel.app&bgcolor=ffffff&color=080c14&margin=2`;
-
-  // Get translated features for known pets or fallback
-  const translatedFeatures = FEATURE_TRANSLATIONS[pet.id]?.[lang] || pet.distinctiveFeatures || `${pet.breed} — ${pet.color}. Very friendly.`;
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
@@ -359,13 +348,28 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
               )}
             </div>
 
-            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.07] space-y-1">
-              <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]"
-                   style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                {t.featuresLabel}
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.07] space-y-1 relative">
+              <div className="flex items-center justify-between">
+                <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]"
+                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {t.featuresLabel}
+                </div>
+                {lang !== 'en' && (
+                  <span className="flex items-center gap-1 text-[10px] text-[#2ec4b6] font-medium">
+                    <Sparkles className="w-3 h-3 text-[#2ec4b6]" />
+                    <span>{t.aiBadge}</span>
+                  </span>
+                )}
               </div>
-              <p className="text-slate-200 leading-relaxed">
-                {translatedFeatures}
+              <p className="text-slate-200 leading-relaxed min-h-[20px]">
+                {isTranslating ? (
+                  <span className="flex items-center gap-2 text-slate-400 italic">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#2ec4b6]" />
+                    Translating with AI...
+                  </span>
+                ) : (
+                  translatedFeatures
+                )}
               </p>
             </div>
           </div>
