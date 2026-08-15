@@ -1,0 +1,233 @@
+{
+  "address": "GnEv5qz2xufNJqsqbkBvmgAa6ByWEmnygN6zayJ1SD8h",
+  "metadata": {
+    "name": "chainpaws",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "ChainPaws — Decentralized Pet Registry & Escrow Recovery Network on Solana"
+  },
+  "instructions": [
+    {
+      "name": "register_pet",
+      "discriminator": [201, 142, 196, 219, 131, 230, 245, 120],
+      "accounts": [
+        {
+          "name": "pet_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [112, 101, 116]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "arg",
+                "path": "chip_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "chip_hash",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "species",
+          "type": "u8"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "breed",
+          "type": "string"
+        },
+        {
+          "name": "metadata_uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "report_lost",
+      "discriminator": [211, 114, 212, 199, 14, 52, 97, 131],
+      "accounts": [
+        {
+          "name": "pet_record",
+          "writable": true
+        },
+        {
+          "name": "bounty_escrow",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [98, 111, 117, 110, 116, 121]
+              },
+              {
+                "kind": "account",
+                "path": "pet_record"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bounty_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancel_bounty",
+      "discriminator": [121, 192, 18, 149, 111, 88, 203, 11],
+      "accounts": [
+        {
+          "name": "pet_record",
+          "writable": true
+        },
+        {
+          "name": "bounty_escrow",
+          "writable": true
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_bounty",
+      "discriminator": [84, 18, 230, 24, 76, 221, 198, 151],
+      "accounts": [
+        {
+          "name": "pet_record",
+          "writable": true
+        },
+        {
+          "name": "bounty_escrow",
+          "writable": true
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "finder",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "register_clinic",
+      "discriminator": [62, 148, 205, 12, 88, 190, 77, 241],
+      "accounts": [
+        {
+          "name": "clinic_record",
+          "writable": true
+        },
+        {
+          "name": "clinic_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "location",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PetRecord",
+      "discriminator": [182, 153, 114, 219, 137, 102, 18, 12]
+    },
+    {
+      "name": "BountyEscrow",
+      "discriminator": [140, 24, 91, 199, 112, 15, 60, 230]
+    },
+    {
+      "name": "ClinicRecord",
+      "discriminator": [45, 112, 98, 178, 222, 134, 90, 14]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PetAlreadyMissing",
+      "msg": "Pet is already reported missing."
+    },
+    {
+      "code": 6001,
+      "name": "PetNotMissing",
+      "msg": "Pet is not currently reported missing."
+    },
+    {
+      "code": 6002,
+      "name": "Unauthorized",
+      "msg": "Unauthorized signer for this pet record."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidBountyAmount",
+      "msg": "Bounty amount must be greater than zero."
+    },
+    {
+      "code": 6004,
+      "name": "BountyNotActive",
+      "msg": "Bounty escrow is not currently active."
+    }
+  ]
+}

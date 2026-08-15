@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+  }
+
+  body {
+    @apply bg-[#080c14] text-slate-100 antialiased min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(20, 241, 149, 0.05) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-interactive {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-interactive:hover {
+  background: rgba(20, 30, 55, 0.85);
+  border-color: rgba(0, 243, 255, 0.3);
+  box-shadow: 0 12px 40px 0 rgba(0, 243, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.glass-glow-cyan {
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+}
+
+.glass-glow-amber {
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+}
+
+.glass-glow-green {
+  border: 1px solid rgba(56, 254, 94, 0.35);
+  box-shadow: 0 0 20px rgba(56, 254, 94, 0.15);
+}
+
+/* Cyber text gradient */
+.text-gradient-cyan {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400;
+}
+
+.text-gradient-solana {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9945FF] via-[#14F195] to-[#00F3FF];
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080c14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 243, 255, 0.4);
+}
+
+/* Wallet Adapter Custom Dark Theme Override */
+.wallet-adapter-button {
+  background-color: #00F3FF !important;
+  color: #080c14 !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.75rem !important;
+  height: 2.5rem !important;
+  padding: 0 1.25rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.35) !important;
+}
+
+.wallet-adapter-button:hover {
+  background-color: #38FE5E !important;
+  box-shadow: 0 0 25px rgba(56, 254, 94, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(0, 243, 255, 0.2) !important;
+  backdrop-filter: blur(20px) !important;
+}
