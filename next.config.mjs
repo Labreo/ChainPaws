@@ -17,6 +17,16 @@ const nextConfig = {
       path: false,
       crypto: false,
     };
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'pino-pretty': false,
+    };
+    config.ignoreWarnings = [
+      { module: /ox/ },
+      { module: /pino/ },
+      { message: /Critical dependency/ },
+      { message: /pino-pretty/ },
+    ];
     return config;
   },
 };
