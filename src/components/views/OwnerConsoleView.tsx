@@ -5,17 +5,15 @@ import Image from 'next/image';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import confetti from 'canvas-confetti';
 import {
-  ShieldCheck,
   ShieldAlert,
-  Coins,
   QrCode,
   CheckCircle,
   ExternalLink,
   MapPin,
   UserCheck,
   RotateCcw,
-  Zap,
   PlusCircle,
+  ShieldCheck,
 } from 'lucide-react';
 import { PetRecord, ClaimRecord } from '@/types';
 import { shortenAddress, getExplorerAddressUrl, getExplorerTxUrl } from '@/lib/solana/pda';
@@ -48,8 +46,6 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
 
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<{ title: string; desc: string; txSig?: string } | null>(null);
-
-  const activeSignerPubkey = publicKey || new PublicKey(demoWalletPubkey);
 
   const handleCancelBounty = async (pet: PetRecord) => {
     setIsProcessing(pet.id);
@@ -150,37 +146,20 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
     }
   };
 
-  const handleSimulateNewSighting = (pet: PetRecord) => {
-    playSound('click');
-    const newClaim: ClaimRecord = {
-      id: `claim-${Date.now()}`,
-      finderAddress: 'QWs7k1ravPgCC959qdS9KpKJajjnY5usKYNMebg5L8M',
-      finderName: 'Elena Rostova',
-      contactInfo: 'elena.finder@solmail.xyz — (555) 019-2834',
-      foundLocation: 'Spotted near park entrance, secured safely in yard',
-      notes: 'Collar tag verified, pet is safe and fed. Ready for owner handover.',
-      timestamp: Date.now(),
-      status: 'pending',
-    };
-    const updated: PetRecord = { ...pet, claims: [newClaim, ...(pet.claims || [])] };
-    onUpdatePet(updated);
-    playSound('radar');
-  };
-
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
 
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
         <div>
-          <p className="label-eyebrow mb-3">Guardian Control Panel</p>
+          <p className="label-eyebrow mb-3">Guardian Dashboard</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
               style={{ fontFamily: 'Montserrat, sans-serif' }}>
             My Registered Companions
             <span className="ml-2 text-slate-500 font-normal text-2xl">({pets.length})</span>
           </h2>
           <p className="text-sm text-slate-400 mt-2">
-            Manage pet identity PDAs, lock SOL escrow bounties, and disburse rewards directly to finders.
+            Manage your pet registrations, set escrow recovery bounties, and confirm finder sightings.
           </p>
         </div>
 
@@ -226,7 +205,6 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
       <div className="space-y-5">
         {pets.map((pet) => {
           const isMissing = pet.status === 'missing';
-          const pendingClaims = (pet.claims || []).filter((c) => c.status === 'pending');
 
           return (
             <div
@@ -237,7 +215,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
 
                 {/* Pet Photo + Info */}
                 <div className="flex items-start gap-5">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-[#080c14] flex-shrink-0 border border-white/[0.07]">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-[#080c14] flex-shrink-0 border border-white/[0.07]">
                     <Image
                       src={pet.imageUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80'}
                       alt={pet.name}
@@ -264,27 +242,26 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                       {pet.breed} — {pet.color} — {pet.species.toUpperCase()}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 pt-0.5">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-0.5">
                       <span>
-                        <span className="text-slate-600">Tag/Chip: </span>
-                        <span className="text-[#2ec4b6] font-bold">{pet.microchipId}</span>
+                        <span className="text-slate-500">Microchip Tag: </span>
+                        <span className="text-[#2ec4b6] font-semibold font-mono">{pet.microchipId}</span>
                       </span>
-                      <span>
-                        <span className="text-slate-600">PDA: </span>
-                        <a
-                          href={getExplorerAddressUrl(pet.pdaAddress)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-slate-300 hover:text-[#2ec4b6] underline transition-colors"
-                        >
-                          {shortenAddress(pet.pdaAddress, 5)}
-                        </a>
-                      </span>
+                      <a
+                        href={getExplorerAddressUrl(pet.pdaAddress)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-slate-400 hover:text-[#2ec4b6] flex items-center gap-1 transition-colors"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Solana Record</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
                     </div>
 
                     {isMissing && pet.bountySol > 0 && (
                       <div className="badge-bounty mt-1 self-start" style={{ display: 'inline-flex' }}>
-                        Locked Escrow: {pet.bountySol} SOL
+                        Locked Escrow Reward: {pet.bountySol} SOL
                       </div>
                     )}
                   </div>
@@ -298,7 +275,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                     className="btn-ghost"
                   >
                     <QrCode className="w-4 h-4" />
-                    Collar QR
+                    Collar Tag
                   </button>
 
                   {isMissing ? (
@@ -316,18 +293,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                       className="btn-danger"
                     >
                       <ShieldAlert className="w-4 h-4" />
-                      Report Lost & Lock Bounty
-                    </button>
-                  )}
-
-                  {isMissing && (
-                    <button
-                      onClick={() => handleSimulateNewSighting(pet)}
-                      title="Simulate a finder sighting to test settlement"
-                      className="btn-ghost text-[#a78bfa] border-[#7c3aed]/30 hover:border-[#7c3aed]/50"
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                      Simulate Sighting
+                      Report Missing & Lock Reward
                     </button>
                   )}
                 </div>
@@ -339,7 +305,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#2ec4b6] uppercase tracking-wider"
                        style={{ fontFamily: 'Montserrat, sans-serif' }}>
                     <UserCheck className="w-4 h-4" />
-                    Recovery Claims ({pet.claims.length})
+                    Recovery Sightings ({pet.claims.length})
                   </div>
 
                   <div className="grid grid-cols-1 gap-3">
@@ -383,7 +349,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                           <div className="px-3 py-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-center"
                                style={{ fontFamily: 'Montserrat, sans-serif' }}>
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                            Bounty Settled
+                            Reward Disbursed
                           </div>
                         )}
                       </div>

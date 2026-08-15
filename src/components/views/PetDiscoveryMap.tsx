@@ -3,8 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PetRecord } from '@/types';
 import { playSound } from '@/lib/sound';
-import { MapPin, Navigation, Search, Layers, Compass, ZoomIn, ZoomOut, CheckCircle2 } from 'lucide-react';
-import { shortenAddress } from '@/lib/solana/pda';
+import { MapPin, Navigation, Compass, ZoomIn, ZoomOut, CheckCircle2 } from 'lucide-react';
 
 interface PetDiscoveryMapProps {
   pets: PetRecord[];
@@ -31,7 +30,6 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
   const markersRef = useRef<any[]>([]);
 
   const [selectedCity, setSelectedCity] = useState<string>('San Francisco');
-  const [mapSearch, setMapSearch] = useState('');
   const [mapStyle, setMapStyle] = useState<'carto_voyager' | 'carto_dark' | 'osm'>('carto_voyager');
 
   const missingPets = pets.filter((p) => p.status === 'missing' && p.lat && p.lng);
@@ -79,6 +77,13 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
 
       mapInstanceRef.current = map;
       renderMarkers(L, map);
+
+      // Ensure proper sizing after DOM render
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 250);
     }
 
     initMap();
@@ -112,7 +117,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         popupAnchor: [0, -26],
         html: `
           <div class="pet-pin-bubble">
-            <img src="${imgSrc}" alt="${pet.name}" style="width:100%;height:100%;object-fit:cover;" />
+            <img src="${imgSrc}" alt="${pet.name}" onerror="this.src='${fallbackImg}'" style="width:100%;height:100%;object-fit:cover;" />
             ${pet.bountySol > 0 ? `<div class="pet-pin-badge">${pet.bountySol} SOL</div>` : ''}
           </div>
         `,
@@ -125,7 +130,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
       popupContent.className = 'p-4 max-w-[280px] space-y-3';
       popupContent.innerHTML = `
         <div class="flex items-center gap-3">
-          <img src="${imgSrc}" alt="${pet.name}" style="width:48px;height:48px;border-radius:0.75rem;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);" />
+          <img src="${imgSrc}" alt="${pet.name}" onerror="this.src='${fallbackImg}'" style="width:48px;height:48px;border-radius:0.75rem;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);" />
           <div>
             <div style="font-family:Montserrat,sans-serif;font-weight:800;font-size:1rem;color:#fff;line-height:1.2;">
               ${pet.name}
@@ -139,7 +144,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         
         <div style="font-size:0.75rem;color:#cbd5e1;line-height:1.4;">
           <div style="display:flex;align-items:center;gap:4px;color:#f1f5f9;">
-            <strong style="color:#2ec4b6;">📍 Location:</strong> ${pet.lastSeenLocation || pet.city || 'Nearby'}
+            <strong style="color:#2ec4b6;">Location:</strong> ${pet.lastSeenLocation || pet.city || 'Nearby'}
           </div>
           <div style="color:#64748b;font-size:0.7rem;margin-top:2px;">
             Missing ${pet.timeElapsed || 'Recently'}
@@ -148,7 +153,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
 
         ${pet.bountySol > 0 ? `
           <div style="background:rgba(244,162,97,0.15);border:1px solid rgba(244,162,97,0.3);padding:6px 10px;border-radius:0.625rem;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-family:Montserrat,sans-serif;font-size:0.7rem;font-weight:700;color:#f4a261;text-transform:uppercase;">Escrow Reward:</span>
+            <span style="font-family:Montserrat,sans-serif;font-size:0.7rem;font-weight:700;color:#f4a261;text-transform:uppercase;">Recovery Reward:</span>
             <span style="font-family:Montserrat,sans-serif;font-size:0.9rem;font-weight:900;color:#f4a261;">${pet.bountySol} SOL</span>
           </div>
         ` : ''}
@@ -158,7 +163,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
             I Found ${pet.name}
           </button>
           <button id="popup-qr-${pet.id}" style="padding:8px 10px;background:rgba(255,255,255,0.06);color:#f1f5f9;border:1px solid rgba(255,255,255,0.12);font-family:Montserrat,sans-serif;font-size:0.75rem;font-weight:600;border-radius:0.5rem;cursor:pointer;">
-            QR Tag
+            Collar Tag
           </button>
         </div>
       `;
@@ -220,17 +225,17 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
   const cities = ['all', 'San Francisco', 'Los Angeles', 'Austin', 'Seattle', 'New York'];
 
   return (
-    <div className="card p-5 sm:p-7 space-y-5">
+    <div className="card p-5 sm:p-7 space-y-5" style={{ position: 'relative', zIndex: 1 }}>
 
       {/* Map Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="label-eyebrow mb-1.5">Live OpenStreetMap Telemetry</p>
+          <p className="label-eyebrow mb-1.5">Live Missing Pet Map</p>
           <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
               style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            <span>Verified Missing Pet Recovery Map</span>
+            <span>Interactive Pet Recovery Map</span>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#2ec4b6]/10 border border-[#2ec4b6]/30 text-[#2ec4b6] font-mono font-bold">
-              {missingPets.length} Live Pins
+              {missingPets.length} Active Pins
             </span>
           </h3>
         </div>
@@ -248,30 +253,32 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              {city === 'all' ? 'All US Hubs' : city}
+              {city === 'all' ? 'All Hubs' : city}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Real Map Canvas */}
-      <div className="relative w-full h-[420px] sm:h-[480px] rounded-2xl overflow-hidden border border-white/[0.1] shadow-2xl">
-        
+      {/* Real Map Canvas — Strictly Isolated with isolation: isolate */}
+      <div
+        className="map-isolation-container relative w-full h-[400px] sm:h-[450px] border border-white/[0.1] shadow-2xl"
+        style={{ isolation: 'isolate', position: 'relative', zIndex: 1, overflow: 'hidden' }}
+      >
         {/* Leaflet DOM container */}
-        <div ref={mapContainerRef} className="w-full h-full" />
+        <div ref={mapContainerRef} className="w-full h-full" style={{ position: 'relative', zIndex: 1 }} />
 
         {/* Floating Custom Zoom Controls */}
-        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-1.5">
+        <div className="absolute top-4 right-4 z-[10] flex flex-col gap-1.5 pointer-events-auto">
           <button
             onClick={handleZoomIn}
-            className="w-9 h-9 rounded-xl bg-[#0d1526]/90 hover:bg-[#0d1526] text-white border border-white/[0.15] flex items-center justify-center shadow-lg transition-colors backdrop-blur-md"
+            className="w-9 h-9 rounded-xl bg-[#0d1526]/95 hover:bg-[#0d1526] text-white border border-white/[0.15] flex items-center justify-center shadow-lg transition-colors backdrop-blur-md"
             title="Zoom in"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={handleZoomOut}
-            className="w-9 h-9 rounded-xl bg-[#0d1526]/90 hover:bg-[#0d1526] text-white border border-white/[0.15] flex items-center justify-center shadow-lg transition-colors backdrop-blur-md"
+            className="w-9 h-9 rounded-xl bg-[#0d1526]/95 hover:bg-[#0d1526] text-white border border-white/[0.15] flex items-center justify-center shadow-lg transition-colors backdrop-blur-md"
             title="Zoom out"
           >
             <ZoomOut className="w-4 h-4" />
@@ -279,7 +286,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         </div>
 
         {/* Floating Map Style Switcher */}
-        <div className="absolute bottom-4 left-4 z-[1000] flex items-center gap-1 p-1 rounded-xl bg-[#0d1526]/90 border border-white/[0.15] text-xs font-mono backdrop-blur-md">
+        <div className="absolute bottom-4 left-4 z-[10] flex items-center gap-1 p-1 rounded-xl bg-[#0d1526]/95 border border-white/[0.15] text-xs font-mono backdrop-blur-md pointer-events-auto">
           <button
             onClick={() => setMapStyle('carto_voyager')}
             className={`px-2.5 py-1 rounded-lg transition-all ${
@@ -304,14 +311,14 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 pt-1">
         <div className="flex items-center gap-2 font-medium">
           <Compass className="w-4 h-4 text-[#2ec4b6]" />
-          <span>Click on any pet marker to view verified location, ISO microchip hash, and submit instant recovery claim.</span>
+          <span>Click on any pet marker to view verified location details and submit an instant recovery claim.</span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[11px]">
           <span className="text-emerald-400 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" />
-            Live OpenStreetMap Tiles
+            OpenStreetMap Live Tiles
           </span>
-          <span className="text-[#f4a261]">Non-Custodial Solana Escrow</span>
+          <span className="text-[#f4a261]">Solana Escrow Protected</span>
         </div>
       </div>
 

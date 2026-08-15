@@ -35,12 +35,17 @@ export default function Home() {
   const [selectedBountyPet, setSelectedBountyPet] = useState<PetRecord | null>(null);
   const [selectedQrPet, setSelectedQrPet] = useState<PetRecord | null>(null);
 
-  // Load / Sync state from localStorage on mount if present
+  // Load / Sync state from localStorage on mount if present (v5 clean key)
   useEffect(() => {
     try {
-      const savedPets = localStorage.getItem('chainpaws_pets_v2');
-      if (savedPets) setPets(JSON.parse(savedPets));
-      const savedTx = localStorage.getItem('chainpaws_txs_v2');
+      const savedPets = localStorage.getItem('chainpaws_pets_v5');
+      if (savedPets) {
+        const parsed = JSON.parse(savedPets);
+        if (Array.isArray(parsed) && parsed.length >= INITIAL_PETS.length) {
+          setPets(parsed);
+        }
+      }
+      const savedTx = localStorage.getItem('chainpaws_txs_v5');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
     } catch {}
   }, []);
@@ -48,8 +53,8 @@ export default function Home() {
   // Save to localStorage when state changes
   useEffect(() => {
     try {
-      localStorage.setItem('chainpaws_pets_v2', JSON.stringify(pets));
-      localStorage.setItem('chainpaws_txs_v2', JSON.stringify(txHistory));
+      localStorage.setItem('chainpaws_pets_v5', JSON.stringify(pets));
+      localStorage.setItem('chainpaws_txs_v5', JSON.stringify(txHistory));
     } catch {}
   }, [pets, txHistory]);
 
@@ -144,7 +149,7 @@ export default function Home() {
     addToast({
       type: 'warning',
       title: `Missing Alert: ${pet.name}`,
-      description: `Locked ${bountySol} SOL in Escrow Vault. Broadcast live on Radar.`,
+      description: `Locked ${bountySol} SOL in Escrow Vault. Broadcast live on Map.`,
       txSig: signature,
     });
   };

@@ -4,20 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import Image from 'next/image';
 import {
-  PawPrint,
   Hash,
-  Shield,
   Upload,
   CheckCircle2,
   ExternalLink,
   QrCode,
   AlertCircle,
-  Cpu,
-  Info,
-  RotateCcw,
+  ShieldCheck,
+  Lock,
+  Sparkles,
+  Smartphone,
 } from 'lucide-react';
 import { PetRecord, Species } from '@/types';
-import { calculateChipHash, derivePetPda, shortenAddress, getExplorerAddressUrl, getExplorerTxUrl } from '@/lib/solana/pda';
+import { calculateChipHash, derivePetPda, shortenAddress, getExplorerTxUrl } from '@/lib/solana/pda';
 import { registerPetTransaction } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
 import { PublicKey } from '@solana/web3.js';
@@ -49,18 +48,17 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
   const [chipHashHex, setChipHashHex] = useState('');
   const [chipHashBytes, setChipHashBytes] = useState<Uint8Array | null>(null);
   const [derivedPda, setDerivedPda] = useState<string>('');
-  const [pdaBump, setPdaBump] = useState<number>(0);
 
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registeredSuccessPet, setRegisteredSuccessPet] = useState<{ pet: PetRecord; sig: string } | null>(null);
 
   const sampleImages = [
-    { label: 'Husky', breed: 'Siberian Husky', url: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Siberian Husky', breed: 'Siberian Husky', url: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80' },
     { label: 'French Bulldog', breed: 'French Bulldog', url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80' },
     { label: 'Golden Retriever', breed: 'Golden Retriever', url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80' },
     { label: 'Corgi', breed: 'Pembroke Welsh Corgi', url: 'https://images.unsplash.com/photo-1612536057832-2ff7ead58194?auto=format&fit=crop&w=800&q=80' },
-    { label: 'Tabby Cat', breed: 'Scottish Fold', url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Scottish Fold', breed: 'Scottish Fold Cat', url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80' },
     { label: 'Bengal Cat', breed: 'Bengal Leopard Cat', url: 'https://images.unsplash.com/photo-1513360309081-38f07627399e?auto=format&fit=crop&w=800&q=80' },
   ];
 
@@ -73,9 +71,8 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
       setChipHashHex(hex);
       setChipHashBytes(bytes);
       try {
-        const { pda, bump } = derivePetPda(activeSignerPubkey, bytes);
+        const { pda } = derivePetPda(activeSignerPubkey, bytes);
         setDerivedPda(pda.toBase58());
-        setPdaBump(bump);
       } catch {
         setDerivedPda('');
       }
@@ -85,13 +82,13 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
 
   const handleQuickTemplate = (preset: { label: string; breed: string; url: string }) => {
     playSound('click');
-    setName(preset.label);
+    setName(preset.label.split(' ')[0]);
     setBreed(preset.breed);
     setSpecies(preset.label.toLowerCase().includes('cat') ? 'cat' : 'dog');
-    setColor('Standard Show Pattern');
+    setColor('Standard Pattern');
     setMicrochipId(`98514100${Math.floor(1000000 + Math.random() * 9000000)}`);
     setImageUrl(preset.url);
-    setDistinctiveFeatures('Active smart collar tag with on-chain PDA identity lookup.');
+    setDistinctiveFeatures('Friendly family companion. Verified on ChainPaws Solana Protocol.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,7 +99,7 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
       return;
     }
     if (!chipHashBytes) {
-      setError('Failed to compute microchip cryptographic hash.');
+      setError('Failed to compute microchip verification key.');
       playSound('alert');
       return;
     }
@@ -188,8 +185,7 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
           Register a New Companion
         </h2>
         <p className="text-slate-300 text-sm leading-relaxed max-w-xl">
-          Mint your pet&apos;s cryptographic identity directly to a Solana Program Derived Account.
-          Generates an immutable on-chain record and printable QR collar tag.
+          Register your pet&apos;s microchip and photo to establish permanent proof of ownership and generate a printable smart collar tag.
         </p>
 
         {/* Quick templates */}
@@ -223,7 +219,7 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                   {registeredSuccessPet.pet.name} is Protected on Solana
                 </h4>
                 <p className="text-xs text-emerald-300 font-mono mt-0.5">
-                  PDA: {registeredSuccessPet.pet.pdaAddress}
+                  Microchip Tag: {registeredSuccessPet.pet.microchipId}
                 </p>
               </div>
             </div>
@@ -232,26 +228,26 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
               className="btn-primary"
             >
               <QrCode className="w-4 h-4" />
-              Get Collar Tag
+              Get Printable Collar Tag
             </button>
           </div>
 
-          <div className="pt-3 border-t border-emerald-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-emerald-300">
-            <span>Transaction Signature:</span>
+          <div className="pt-3 border-t border-emerald-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-300">
+            <span>Blockchain Verification:</span>
             <a
               href={getExplorerTxUrl(registeredSuccessPet.sig)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#2ec4b6] hover:text-white flex items-center gap-1.5 font-bold transition-colors"
+              className="text-[#2ec4b6] hover:text-white flex items-center gap-1.5 font-semibold transition-colors"
             >
-              {shortenAddress(registeredSuccessPet.sig, 10)}
+              View on Solana Explorer
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
       )}
 
-      {/* ── Form + Terminal ── */}
+      {/* ── Form + Information Panel ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Left: Form */}
@@ -345,9 +341,9 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                      style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 <span className="flex items-center gap-1.5">
                   <Hash className="w-3.5 h-3.5 text-[#2ec4b6]" />
-                  Microchip ISO 11784 / Tag ID *
+                  Microchip ISO 11784 / Collar Tag ID *
                 </span>
-                <span className="text-[10px] text-slate-600 normal-case font-mono">15-digit or custom</span>
+                <span className="text-[10px] text-slate-500 normal-case">15-digit standard or collar code</span>
               </label>
               <input
                 type="text"
@@ -385,7 +381,7 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                 rows={2}
                 value={distinctiveFeatures}
                 onChange={(e) => setDistinctiveFeatures(e.target.value)}
-                placeholder="e.g. Wearing red harness, chipped tooth, friendly, responds to whistle."
+                placeholder="e.g. Wearing red harness, chipped tooth, very friendly, responds to whistle."
                 className="input-field resize-none"
               />
             </div>
@@ -396,54 +392,65 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
               disabled={isRegistering}
               className="btn-primary w-full py-3.5 text-sm"
             >
-              {isRegistering ? 'Minting Identity on Solana Devnet...' : 'Mint Pet Identity PDA on Solana'}
+              {isRegistering ? 'Registering on Solana Devnet...' : 'Register Pet Identity on Solana'}
             </button>
 
           </form>
         </div>
 
-        {/* Right: Terminal + Preview */}
+        {/* Right: Informational Value Card + Preview */}
         <div className="space-y-6">
 
-          {/* PDA Derivation Terminal */}
-          <div className="terminal-block space-y-4">
-            <div className="flex items-center gap-2 text-[#2ec4b6] font-bold text-xs mb-2">
-              <Cpu className="w-4 h-4" />
-              <span>PDA DERIVATION TELEMETRY</span>
+          {/* Value Proposition Card */}
+          <div className="card p-6 space-y-4">
+            <div className="flex items-center gap-2.5 text-white font-bold text-sm"
+                 style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              <ShieldCheck className="w-5 h-5 text-[#2ec4b6]" />
+              <span>How Protection Works</span>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-slate-500 text-[10px]">Microchip SHA-256 Digest:</div>
-              <div className="text-[#2ec4b6] text-[10px] break-all leading-relaxed">
-                {chipHashHex || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}
+            <div className="space-y-3.5 text-xs text-slate-300">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-lg bg-[#2ec4b6]/10 text-[#2ec4b6] flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                  1
+                </div>
+                <div>
+                  <strong className="text-white">Tamper-Proof Identity:</strong>
+                  <p className="text-slate-400 mt-0.5 leading-relaxed">
+                    Your pet&apos;s microchip ID is stored permanently on the Solana blockchain and bound to your wallet.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <div className="text-slate-500 text-[10px]">PDA Seeds:</div>
-              <div className="space-y-1 text-[10px]">
-                <div className="text-slate-400">1. const: <span className="text-[#f4a261]">&quot;pet&quot;</span></div>
-                <div className="text-slate-400">2. owner: <span className="text-[#a78bfa]">{shortenAddress(activeSignerPubkey.toBase58(), 4)}</span></div>
-                <div className="text-slate-400">3. hash: <span className="text-[#2ec4b6]">{chipHashHex ? `${chipHashHex.slice(0, 10)}...` : '[u8; 32]'}</span></div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-lg bg-[#f4a261]/10 text-[#f4a261] flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                  2
+                </div>
+                <div>
+                  <strong className="text-white">Printable QR Collar Tag:</strong>
+                  <p className="text-slate-400 mt-0.5 leading-relaxed">
+                    Generates a physical QR tag for collar attachments. Anyone who finds your pet can scan it with a smartphone.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <div className="text-slate-500 text-[10px]">Target Address (Bump {pdaBump}):</div>
-              <div className="text-[#2ec4b6] text-[10px] break-all font-bold leading-relaxed">
-                {derivedPda || 'Deriving...'}
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                  3
+                </div>
+                <div>
+                  <strong className="text-white">Non-Custodial Escrow:</strong>
+                  <p className="text-slate-400 mt-0.5 leading-relaxed">
+                    If your pet goes missing, you can lock a SOL reward into a smart contract that finders can trust.
+                  </p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-start gap-1.5 pt-2 border-t border-[#2ec4b6]/20 text-[10px] text-slate-500">
-              <Info className="w-3 h-3 text-[#2ec4b6] flex-shrink-0 mt-0.5" />
-              <span>Immutable storage rent paid once from owner wallet.</span>
             </div>
           </div>
 
           {/* Photo Preview */}
           {imageUrl && (
-            <div className="rounded-xl overflow-hidden border border-white/[0.07] relative h-52">
+            <div className="rounded-2xl overflow-hidden border border-white/[0.07] relative h-52">
               <Image
                 src={imageUrl}
                 alt="Pet Preview"
@@ -451,7 +458,7 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                 className="object-cover"
                 unoptimized
               />
-              <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg bg-[#080c14]/90 text-[10px] text-slate-300 font-semibold backdrop-blur-sm">
+              <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-[#080c14]/90 text-[10px] text-slate-300 font-semibold backdrop-blur-sm">
                 Photo Preview
               </div>
             </div>

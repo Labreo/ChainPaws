@@ -13,8 +13,6 @@ import {
   CheckCircle2,
   Map as MapIcon,
   ShieldCheck,
-  Coins,
-  AlertTriangle,
 } from 'lucide-react';
 import { PetRecord } from '@/types';
 import { shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
@@ -26,7 +24,7 @@ const PetDiscoveryMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="card h-[420px] sm:h-[480px] flex items-center justify-center text-slate-500 font-mono text-xs">
+      <div className="card h-[400px] sm:h-[450px] flex items-center justify-center text-slate-500 font-mono text-xs">
         <span>Loading OpenStreetMap Telemetry Engine...</span>
       </div>
     ),
@@ -53,6 +51,13 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
   const [showMap, setShowMap] = useState(true);
   const [highBountyOnly, setHighBountyOnly] = useState(false);
   const [medicalUrgentOnly, setMedicalUrgentOnly] = useState(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  const fallbackPetImages: Record<string, string> = {
+    dog: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
+    cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+    other: 'https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=800&q=80',
+  };
 
   const filteredPets = useMemo(() => {
     return pets
@@ -86,9 +91,9 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
     .reduce((sum, p) => sum + (p.bountySol || 0), 0);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
 
-      {/* ── Hero / Protocol Banner ── */}
+      {/* ── Hero Banner ── */}
       <section className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0d1526] p-8 sm:p-12 lg:p-14">
         {/* Ambient Subtle Glow */}
         <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-[#2ec4b6]/5 rounded-full blur-3xl pointer-events-none" />
@@ -98,13 +103,12 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
 
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08]"
               style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            Stop Lost Pet Scams with{' '}
+            Protecting Pets with{' '}
             <span className="text-gradient-teal">Trustless Bounties</span>
           </h1>
 
           <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
-            Owners lock SOL rewards into non-custodial Program Derived Accounts.
-            Finders receive guaranteed smart contract payouts upon verified microchip match.
+            Owners deposit recovery rewards into secure Solana escrow accounts. Finders receive guaranteed payouts upon verified microchip identification.
           </p>
 
           {/* Metrics Grid */}
@@ -112,7 +116,7 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
             {[
               { label: 'Active Alerts', value: missingCount, color: 'text-red-400' },
               { label: 'Escrow Vault', value: `${totalBounty.toFixed(2)} SOL`, color: 'text-[#f4a261]' },
-              { label: 'Protected PDAs', value: pets.length, color: 'text-[#2ec4b6]' },
+              { label: 'Protected Pets', value: pets.length, color: 'text-[#2ec4b6]' },
               { label: 'Recovery Rate', value: '100%', color: 'text-emerald-400' },
             ].map(({ label, value, color }) => (
               <div key={label} className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
@@ -138,7 +142,7 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
               className="btn-ghost py-3 px-6 text-xs flex items-center gap-2"
             >
               <MapIcon className="w-4 h-4 text-[#2ec4b6]" />
-              <span>{showMap ? 'Hide Live Map' : 'Show OpenStreetMap View'}</span>
+              <span>{showMap ? 'Hide Map View' : 'Show OpenStreetMap View'}</span>
             </button>
           </div>
         </div>
@@ -164,7 +168,7 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, breed, location (e.g. SF, Venice, Austin), or microchip ID..."
+              placeholder="Search by pet name, breed, or city (e.g. San Francisco, Venice, Austin)..."
               className="input-field pl-10"
             />
           </div>
@@ -275,6 +279,10 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPets.map((pet) => {
             const isMissing = pet.status === 'missing';
+            const petImageSrc = failedImages[pet.id]
+              ? fallbackPetImages[pet.species] || fallbackPetImages.dog
+              : pet.imageUrl || fallbackPetImages[pet.species] || fallbackPetImages.dog;
+
             return (
               <article
                 key={pet.id}
@@ -286,10 +294,13 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
                   {/* Photo Banner */}
                   <div className="relative h-60 bg-[#080c14] overflow-hidden">
                     <Image
-                      src={pet.imageUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80'}
-                      alt={`Photo of ${pet.name}`}
+                      src={petImageSrc}
+                      alt={pet.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={() => {
+                        setFailedImages((prev) => ({ ...prev, [pet.id]: true }));
+                      }}
                       unoptimized
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0d1526] via-[#0d1526]/20 to-transparent" />
@@ -364,27 +375,19 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
                       </div>
                     )}
 
-                    {/* Active Claims Notice */}
-                    {pet.claims && pet.claims.length > 0 && (
-                      <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#2ec4b6]/8 border border-[#2ec4b6]/25 text-[11px]">
-                        <span className="text-[#2ec4b6] font-semibold"
-                              style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                          {pet.claims.length} sighting report{pet.claims.length > 1 ? 's' : ''} submitted
-                        </span>
-                        <span className="text-slate-400 font-mono">Pending</span>
-                      </div>
-                    )}
-
-                    {/* Microchip Hash & PDA */}
-                    <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-[11px] font-mono text-slate-500">
-                      <span>PDA: {shortenAddress(pet.pdaAddress, 4)}</span>
+                    {/* Microchip Identification */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
+                      <span className="text-slate-500 font-mono text-[11px]">
+                        Tag: <span className="text-[#2ec4b6] font-semibold">{pet.microchipId}</span>
+                      </span>
                       <a
                         href={getExplorerAddressUrl(pet.pdaAddress)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#2ec4b6] hover:text-white flex items-center gap-1 transition-colors"
+                        className="text-slate-400 hover:text-[#2ec4b6] flex items-center gap-1 text-[11px] transition-colors"
                       >
-                        Explorer
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Solana Record</span>
                         <ExternalLink className="w-2.5 h-2.5" />
                       </a>
                     </div>

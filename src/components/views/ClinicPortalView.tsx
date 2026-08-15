@@ -10,13 +10,12 @@ import {
   AlertCircle,
   ExternalLink,
   Award,
-  Stethoscope,
   Smartphone,
   Wifi,
   QrCode,
 } from 'lucide-react';
 import { PetRecord, ClinicRecord } from '@/types';
-import { calculateChipHash, deriveClinicPda, shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
+import { calculateChipHash, shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
 import { playSound } from '@/lib/sound';
 
 interface ClinicPortalViewProps {
@@ -114,11 +113,10 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
         <p className="label-eyebrow">Veterinary & Shelter Verification Terminal</p>
         <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
             style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          Microchip Scanner & NFC Collar Hub
+          Microchip Scanner & Clinic Verification
         </h2>
         <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
-          Authorized vet clinics and humane shelters scan RFID microchips to instantly query Solana PDAs
-          and cryptographically verify missing pets.
+          Veterinary clinics and humane shelters scan RFID microchips or NFC collar tags to instantly verify registered companions and facilitate safe returns.
         </p>
       </div>
 
@@ -135,10 +133,10 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
               <div>
                 <h3 className="text-lg font-bold text-white"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  RFID / ISO 11784 Microchip Scanner
+                  Microchip / Tag Scanner
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Enter 15-digit chip ID or Tag ID to query on-chain PetRecord PDA
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Enter 15-digit ISO microchip number or collar tag ID
                 </p>
               </div>
             </div>
@@ -150,7 +148,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                   required
                   value={scanInput}
                   onChange={(e) => setScanInput(e.target.value)}
-                  placeholder="e.g. 985141009823451 or 985141007890123"
+                  placeholder="e.g. 985141009823451 or TAG-SF-8891"
                   className="input-field font-mono text-[#2ec4b6] pr-32"
                 />
                 <button
@@ -158,7 +156,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                   disabled={isSearching}
                   className="btn-primary absolute right-2 top-1.5 py-2 px-4 text-xs rounded-lg disabled:opacity-50"
                 >
-                  {isSearching ? 'Querying...' : 'Scan Chip'}
+                  {isSearching ? 'Scanning...' : 'Scan Chip'}
                 </button>
               </div>
 
@@ -166,7 +164,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]"
                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  1-Click Test:
+                  Quick Test:
                 </span>
                 {pets.slice(0, 4).map((p) => (
                   <button
@@ -187,15 +185,15 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                 <div className="flex items-center gap-2 text-[#a78bfa] text-xs font-semibold"
                      style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   <Smartphone className="w-4 h-4" />
-                  NFC Smart Collar Simulator
+                  NFC Collar Tag Tap Simulator
                 </div>
                 <Wifi className="w-4 h-4 text-[#a78bfa] animate-pulse" />
               </div>
               <p className="text-xs text-slate-400">
-                Simulates tapping a smartphone against a missing pet&apos;s NFC smart collar:
+                Simulates scanning a missing pet&apos;s smart collar with an NFC-enabled smartphone:
               </p>
               <div className="flex flex-wrap gap-2">
-                {pets.filter((p) => p.status === 'missing').map((p) => (
+                {pets.filter((p) => p.status === 'missing').slice(0, 4).map((p) => (
                   <button
                     key={p.id}
                     type="button"
@@ -216,17 +214,17 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                 <AlertCircle className="w-7 h-7 text-red-400 mx-auto" />
                 <h4 className="text-sm font-semibold text-white"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  No Record Found on Solana
+                  No Companion Record Found
                 </h4>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Microchip ID &ldquo;{scanInput}&rdquo; is not registered under any active PetRecord PDA.
+                  Microchip ID &ldquo;{scanInput}&rdquo; is not currently registered in the database.
                 </p>
               </div>
             )}
 
             {/* Match result */}
             {scannedPet && (
-              <div className="p-6 rounded-xl border border-[#2ec4b6]/30 bg-[#2ec4b6]/5 space-y-4">
+              <div className="p-6 rounded-2xl border border-[#2ec4b6]/30 bg-[#2ec4b6]/5 space-y-4">
 
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
@@ -264,18 +262,21 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                   )}
                 </div>
 
-                <div className="terminal-block space-y-1.5">
+                <div className="p-4 rounded-xl bg-[#080c14]/80 border border-white/[0.07] space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Verified Microchip:</span>
-                    <span className="text-[#2ec4b6] font-bold">{scannedPet.microchipId}</span>
+                    <span className="text-slate-400">ISO Microchip ID:</span>
+                    <span className="text-[#2ec4b6] font-mono font-bold">{scannedPet.microchipId}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Pet PDA Address:</span>
-                    <span className="text-slate-300 font-bold">{shortenAddress(scannedPet.pdaAddress, 6)}</span>
+                    <span className="text-slate-400">Ownership Status:</span>
+                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Verified on Solana Devnet
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Owner Wallet:</span>
-                    <span className="text-slate-300">{shortenAddress(scannedPet.ownerAddress, 6)}</span>
+                    <span className="text-slate-400">Owner Wallet:</span>
+                    <span className="text-slate-300 font-mono">{shortenAddress(scannedPet.ownerAddress, 6)}</span>
                   </div>
                 </div>
 
@@ -310,7 +311,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider"
                  style={{ fontFamily: 'Montserrat, sans-serif' }}>
               <Building2 className="w-4 h-4" />
-              Licensed Clinics ({registeredClinics.length})
+              Verified Clinics ({registeredClinics.length})
             </div>
 
             <div className="space-y-2.5">
@@ -327,9 +328,6 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                     <span className="badge-safe">Verified</span>
                   </div>
                   <p className="text-slate-400">{clinic.location}</p>
-                  <div className="font-mono text-[10px] text-slate-600 pt-0.5">
-                    PDA: {clinic.pdaAddress}
-                  </div>
                 </div>
               ))}
             </div>
@@ -339,7 +337,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
           <div className="card-flat p-5 space-y-4">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              Register Vet Clinic Authority
+              Register Veterinary Authority
             </h4>
             <form onSubmit={handleRegisterClinic} className="space-y-3">
               <input
@@ -355,7 +353,7 @@ export const ClinicPortalView: React.FC<ClinicPortalViewProps> = ({
                 required
                 value={clinicLocation}
                 onChange={(e) => setClinicLocation(e.target.value)}
-                placeholder="City, State / Address"
+                placeholder="City, State / Street Address"
                 className="input-field text-xs"
               />
               <button

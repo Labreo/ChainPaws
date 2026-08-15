@@ -12,13 +12,9 @@ import {
   Terminal,
   Droplet,
   Coins,
-  ChevronDown,
-  ExternalLink,
-  Wallet,
 } from 'lucide-react';
 import { requestDevnetAirdrop, getSolBalance } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
-import { shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
 
 const WalletMultiButton = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -40,8 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   onAirdropSuccess,
   missingCount,
-  demoWalletPubkey,
-  isDemoMode,
 }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -57,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         const bal = await getSolBalance(connection, publicKey);
         if (isMounted) setSolBalance(bal);
       } else {
-        if (isMounted) setSolBalance(3.45); // Demo balance
+        if (isMounted) setSolBalance(3.45);
       }
     }
     updateBalance();
@@ -96,17 +90,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navItems = [
-    { id: 'radar', label: 'Live Map & Radar', icon: Radio, count: missingCount > 0 ? missingCount : null },
+    { id: 'radar', label: 'Live Map & Alerts', icon: Radio, count: missingCount > 0 ? missingCount : null },
     { id: 'register', label: 'Register Pet', icon: PlusCircle },
     { id: 'mypets', label: 'My Pets', icon: ShieldCheck },
     { id: 'clinic', label: 'Clinic Portal', icon: Building2 },
-    { id: 'trust', label: 'Trust Inspector', icon: Terminal },
+    { id: 'trust', label: 'Trust Audit', icon: Terminal },
   ];
 
-  const activeWalletAddress = publicKey ? publicKey.toBase58() : demoWalletPubkey;
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#080c14]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-[9999] w-full border-b border-white/[0.08] bg-[#080c14]/95 backdrop-blur-2xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Bar */}
