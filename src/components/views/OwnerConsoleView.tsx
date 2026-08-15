@@ -10,18 +10,12 @@ import {
   Coins,
   QrCode,
   CheckCircle,
-  XCircle,
-  AlertTriangle,
   ExternalLink,
   MapPin,
-  Clock,
-  Sparkles,
-  ArrowRight,
   UserCheck,
   RotateCcw,
-  Send,
-  PlusCircle,
   Zap,
+  PlusCircle,
 } from 'lucide-react';
 import { PetRecord, ClaimRecord } from '@/types';
 import { shortenAddress, getExplorerAddressUrl, getExplorerTxUrl } from '@/lib/solana/pda';
@@ -65,11 +59,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
       let isSimulated = false;
 
       if (publicKey) {
-        const result = await cancelBountyTransaction(
-          connection,
-          wallet as any,
-          new PublicKey(pet.pdaAddress)
-        );
+        const result = await cancelBountyTransaction(connection, wallet as any, new PublicKey(pet.pdaAddress));
         signature = result.signature;
         isSimulated = result.isSimulated;
       } else {
@@ -77,13 +67,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
         isSimulated = true;
       }
 
-      const updated: PetRecord = {
-        ...pet,
-        status: 'safe',
-        bountySol: 0,
-        bountyEscrowPda: undefined,
-      };
-
+      const updated: PetRecord = { ...pet, status: 'safe', bountySol: 0, bountyEscrowPda: undefined };
       playSound('success');
       onUpdatePet(updated);
       onAddTxHistory({
@@ -121,12 +105,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
 
       if (publicKey) {
         const finderPubkey = new PublicKey(claim.finderAddress);
-        const result = await claimBountyTransaction(
-          connection,
-          wallet as any,
-          new PublicKey(pet.pdaAddress),
-          finderPubkey
-        );
+        const result = await claimBountyTransaction(connection, wallet as any, new PublicKey(pet.pdaAddress), finderPubkey);
         signature = result.signature;
         isSimulated = result.isSimulated;
       } else {
@@ -134,35 +113,22 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
         isSimulated = true;
       }
 
-      // Trigger Confetti & Victory chime!
       try {
-        confetti({
-          particleCount: 150,
-          spread: 90,
-          origin: { y: 0.6 },
-          colors: ['#00F3FF', '#38FE5E', '#F59E0B', '#9945FF'],
-        });
+        confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 }, colors: ['#2ec4b6', '#f4a261', '#7c3aed', '#059669'] });
       } catch {}
       playSound('success');
 
       const updatedClaims = (pet.claims || []).map((c) =>
         c.id === claim.id ? { ...c, status: 'paid' as const, txSignature: signature } : c
       );
-
-      const updated: PetRecord = {
-        ...pet,
-        status: 'safe',
-        bountySol: 0,
-        bountyEscrowPda: undefined,
-        claims: updatedClaims,
-      };
+      const updated: PetRecord = { ...pet, status: 'safe', bountySol: 0, bountyEscrowPda: undefined, claims: updatedClaims };
 
       onUpdatePet(updated);
       onAddTxHistory({
         id: `tx-${Date.now()}`,
         signature,
         type: 'claim_bounty',
-        description: `Disbursed ${pet.bountySol} SOL reward to finder (${shortenAddress(claim.finderAddress)}) for recovering ${pet.name}!`,
+        description: `Disbursed ${pet.bountySol} SOL reward to finder (${shortenAddress(claim.finderAddress)}) for recovering ${pet.name}`,
         timestamp: Date.now(),
         petName: pet.name,
         amountSol: pet.bountySol,
@@ -170,8 +136,8 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
       });
 
       setSuccessToast({
-        title: `🏆 Recovery Settled! ${pet.name} is Reunited!`,
-        desc: `${pet.bountySol} SOL successfully disbursed to finder ${shortenAddress(claim.finderAddress)}. Escrow closed.`,
+        title: `Recovery Settled — ${pet.name} is Reunited`,
+        desc: `${pet.bountySol} SOL disbursed to finder ${shortenAddress(claim.finderAddress)}. Escrow closed.`,
         txSig: signature,
       });
       setTimeout(() => setSuccessToast(null), 8000);
@@ -189,73 +155,66 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
     const newClaim: ClaimRecord = {
       id: `claim-${Date.now()}`,
       finderAddress: 'QWs7k1ravPgCC959qdS9KpKJajjnY5usKYNMebg5L8M',
-      finderName: 'Elena Rostova (Finder)',
-      contactInfo: 'elena.finder@solmail.xyz • (555) 019-2834',
+      finderName: 'Elena Rostova',
+      contactInfo: 'elena.finder@solmail.xyz — (555) 019-2834',
       foundLocation: 'Spotted near park entrance, secured safely in yard',
       notes: 'Collar tag verified, pet is safe and fed. Ready for owner handover.',
       timestamp: Date.now(),
       status: 'pending',
     };
-
-    const updated: PetRecord = {
-      ...pet,
-      claims: [newClaim, ...(pet.claims || [])],
-    };
-
+    const updated: PetRecord = { ...pet, claims: [newClaim, ...(pet.claims || [])] };
     onUpdatePet(updated);
     playSound('radar');
   };
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      
-      {/* Header Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+      {/* ── Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold mb-2">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>GUARDIAN CONTROL PANEL</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            My Registered Companions ({pets.length})
+          <p className="label-eyebrow mb-3">Guardian Control Panel</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            My Registered Companions
+            <span className="ml-2 text-slate-500 font-normal text-2xl">({pets.length})</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300">
+          <p className="text-sm text-slate-400 mt-2">
             Manage pet identity PDAs, lock SOL escrow bounties, and disburse rewards directly to finders.
           </p>
         </div>
 
         <button
-          onClick={() => {
-            onNavigateRegister();
-            playSound('click');
-          }}
-          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-cyan-950 hover:brightness-110 transition-all flex items-center space-x-2 cursor-pointer"
+          onClick={() => { onNavigateRegister(); playSound('click'); }}
+          className="btn-primary flex-shrink-0"
         >
-          <Sparkles className="w-4 h-4 text-slate-950" />
-          <span>+ Register Another Pet</span>
+          <PlusCircle className="w-4 h-4" />
+          Register Another Pet
         </button>
       </div>
 
-      {/* Success Toast */}
+      {/* ── Success Toast ── */}
       {successToast && (
-        <div className="p-6 rounded-3xl bg-emerald-950/90 border border-emerald-500/50 backdrop-blur-2xl shadow-[0_0_40px_rgba(16,185,129,0.3)] space-y-2 animate-glow">
-          <div className="flex items-center space-x-3">
-            <CheckCircle className="w-7 h-7 text-emerald-400 flex-shrink-0" />
+        <div className="p-5 rounded-2xl bg-emerald-950/60 border border-emerald-500/35 space-y-3">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-6 h-6 text-emerald-400 flex-shrink-0" />
             <div>
-              <h4 className="text-lg font-black text-white">{successToast.title}</h4>
-              <p className="text-xs text-emerald-300 font-medium">{successToast.desc}</p>
+              <h4 className="font-semibold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                {successToast.title}
+              </h4>
+              <p className="text-xs text-emerald-300 mt-0.5">{successToast.desc}</p>
             </div>
           </div>
           {successToast.txSig && (
-            <div className="pt-2 border-t border-emerald-800/50 flex items-center justify-between text-xs font-mono text-emerald-200">
-              <span>Solana Devnet Signature:</span>
+            <div className="pt-2 border-t border-emerald-800/40 flex items-center justify-between text-xs font-mono text-emerald-300">
+              <span>Signature:</span>
               <a
                 href={getExplorerTxUrl(successToast.txSig)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline inline-flex items-center space-x-1 text-cyan-300 hover:text-white font-bold"
+                className="text-[#2ec4b6] hover:text-white flex items-center gap-1 font-bold transition-colors"
               >
-                <span>{shortenAddress(successToast.txSig, 8)}</span>
+                {shortenAddress(successToast.txSig, 8)}
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -263,8 +222,8 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
         </div>
       )}
 
-      {/* Pet Console Cards */}
-      <div className="space-y-6">
+      {/* ── Pet Cards ── */}
+      <div className="space-y-5">
         {pets.map((pet) => {
           const isMissing = pet.status === 'missing';
           const pendingClaims = (pet.claims || []).filter((c) => c.status === 'pending');
@@ -272,17 +231,13 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
           return (
             <div
               key={pet.id}
-              className={`p-6 sm:p-8 rounded-3xl bg-slate-900/90 border backdrop-blur-2xl transition-all shadow-2xl ${
-                isMissing
-                  ? 'border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.15)]'
-                  : 'border-white/10 hover:border-white/20'
-              }`}
+              className={`card p-6 sm:p-7 ${isMissing ? 'border-red-500/25 hover:border-red-400/35' : ''}`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                
-                {/* Left: Pet Photo & Details */}
-                <div className="flex items-start space-x-4 sm:space-x-6">
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-950 flex-shrink-0 border border-white/10 shadow-lg">
+
+                {/* Pet Photo + Info */}
+                <div className="flex items-start gap-5">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-[#080c14] flex-shrink-0 border border-white/[0.07]">
                     <Image
                       src={pet.imageUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80'}
                       alt={pet.name}
@@ -293,133 +248,125 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                   </div>
 
                   <div className="space-y-1.5">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="text-2xl sm:text-3xl font-black text-white">{pet.name}</h3>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                        {pet.name}
+                      </h3>
                       {isMissing ? (
-                        <span className="px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black uppercase font-mono">
-                          MISSING ALERT
-                        </span>
+                        <span className="badge-missing">Missing Alert</span>
                       ) : (
-                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-black uppercase font-mono">
-                          SAFE AT HOME
-                        </span>
+                        <span className="badge-safe">Safe at Home</span>
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-300 font-semibold">
-                      {pet.breed} • {pet.color} • {pet.species.toUpperCase()}
+                    <p className="text-xs text-slate-400 font-medium">
+                      {pet.breed} — {pet.color} — {pet.species.toUpperCase()}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 pt-1">
-                      <div>
-                        <span className="text-slate-500">Tag/Chip:</span>{' '}
-                        <span className="text-cyan-300 font-bold">{pet.microchipId}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">PDA:</span>{' '}
+                    <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 pt-0.5">
+                      <span>
+                        <span className="text-slate-600">Tag/Chip: </span>
+                        <span className="text-[#2ec4b6] font-bold">{pet.microchipId}</span>
+                      </span>
+                      <span>
+                        <span className="text-slate-600">PDA: </span>
                         <a
                           href={getExplorerAddressUrl(pet.pdaAddress)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-slate-300 hover:text-cyan-300 underline font-bold"
+                          className="text-slate-300 hover:text-[#2ec4b6] underline transition-colors"
                         >
                           {shortenAddress(pet.pdaAddress, 5)}
                         </a>
-                      </div>
+                      </span>
                     </div>
 
                     {isMissing && pet.bountySol > 0 && (
-                      <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-mono font-black mt-2 shadow">
-                        <Coins className="w-4 h-4 text-amber-400 fill-current" />
-                        <span>Locked Escrow: {pet.bountySol} SOL</span>
+                      <div className="badge-bounty mt-1 self-start" style={{ display: 'inline-flex' }}>
+                        Locked Escrow: {pet.bountySol} SOL
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Right: Status Action Buttons */}
+                {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-2.5 lg:self-center">
-                  
-                  {/* View Collar Tag */}
+
                   <button
-                    onClick={() => {
-                      onOpenQrModal(pet);
-                      playSound('click');
-                    }}
-                    className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-cyan-300 hover:text-white border border-slate-700 text-xs font-black flex items-center space-x-1.5 transition-all shadow cursor-pointer"
+                    onClick={() => { onOpenQrModal(pet); playSound('click'); }}
+                    className="btn-ghost"
                   >
                     <QrCode className="w-4 h-4" />
-                    <span>Collar QR</span>
+                    Collar QR
                   </button>
 
-                  {/* Report Lost vs Cancel */}
                   {isMissing ? (
                     <button
                       onClick={() => handleCancelBounty(pet)}
                       disabled={isProcessing === pet.id}
-                      className="px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 text-xs font-black flex items-center space-x-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                      className="btn-ghost disabled:opacity-50"
                     >
-                      <RotateCcw className="w-4 h-4 text-amber-400" />
-                      <span>Cancel & Refund {pet.bountySol} SOL</span>
+                      <RotateCcw className="w-4 h-4 text-[#f4a261]" />
+                      Cancel & Refund {pet.bountySol} SOL
                     </button>
                   ) : (
                     <button
-                      onClick={() => {
-                        onOpenBountyModal(pet);
-                        playSound('click');
-                      }}
-                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-rose-400 to-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-rose-950 hover:brightness-110 transition-all flex items-center space-x-1.5 cursor-pointer"
+                      onClick={() => { onOpenBountyModal(pet); playSound('click'); }}
+                      className="btn-danger"
                     >
-                      <ShieldAlert className="w-4 h-4 text-slate-950" />
-                      <span>Report Lost & Lock Bounty</span>
+                      <ShieldAlert className="w-4 h-4" />
+                      Report Lost & Lock Bounty
                     </button>
                   )}
 
-                  {/* Quick test sighting simulation button for demo */}
                   {isMissing && (
                     <button
                       onClick={() => handleSimulateNewSighting(pet)}
-                      title="Simulate a finder sighting submission to test settlement"
-                      className="px-4 py-3 rounded-2xl bg-purple-950/70 hover:bg-purple-900 border border-purple-500/40 text-purple-300 text-xs font-black flex items-center space-x-1.5 transition-all cursor-pointer"
+                      title="Simulate a finder sighting to test settlement"
+                      className="btn-ghost text-[#a78bfa] border-[#7c3aed]/30 hover:border-[#7c3aed]/50"
                     >
-                      <Zap className="w-3.5 h-3.5 text-purple-400" />
-                      <span>+ Simulate Sighting</span>
+                      <Zap className="w-3.5 h-3.5" />
+                      Simulate Sighting
                     </button>
                   )}
-
                 </div>
-
               </div>
 
-              {/* Sighting Claims List for this Pet */}
+              {/* Claims */}
               {pet.claims && pet.claims.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-white/5 space-y-3">
-                  <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center space-x-2">
+                <div className="mt-6 pt-5 border-t border-white/[0.06] space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[#2ec4b6] uppercase tracking-wider"
+                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
                     <UserCheck className="w-4 h-4" />
-                    <span>Recovery Claims & Sighting Submissions ({pet.claims.length})</span>
-                  </h4>
+                    Recovery Claims ({pet.claims.length})
+                  </div>
 
                   <div className="grid grid-cols-1 gap-3">
                     {pet.claims.map((claim) => (
                       <div
                         key={claim.id}
-                        className="p-5 rounded-2xl bg-slate-950 border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg"
+                        className="p-4 rounded-xl bg-[#080c14]/70 border border-white/[0.07] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                       >
-                        <div className="space-y-1.5">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-black text-white">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-white"
+                                  style={{ fontFamily: 'Montserrat, sans-serif' }}>
                               {claim.finderName || shortenAddress(claim.finderAddress, 5)}
                             </span>
-                            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded-full border border-cyan-500/30 font-bold">
+                            <span className="text-[10px] font-mono text-[#2ec4b6] bg-[#2ec4b6]/8 px-2 py-0.5 rounded-full border border-[#2ec4b6]/20">
                               {shortenAddress(claim.finderAddress, 5)}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                          <p className="text-xs text-slate-300 leading-relaxed">
                             &ldquo;{claim.notes}&rdquo;
                           </p>
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-mono">
-                            <span>📍 {claim.foundLocation}</span>
-                            <span>📞 {claim.contactInfo}</span>
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {claim.foundLocation}
+                            </span>
+                            <span>{claim.contactInfo}</span>
                           </div>
                         </div>
 
@@ -427,15 +374,16 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                           <button
                             onClick={() => handleSettleClaim(pet, claim)}
                             disabled={isProcessing === pet.id}
-                            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-xl shadow-emerald-950 hover:brightness-110 transition-all flex items-center space-x-2 whitespace-nowrap self-start sm:self-center disabled:opacity-50 cursor-pointer"
+                            className="btn-primary whitespace-nowrap self-start sm:self-center disabled:opacity-50"
                           >
-                            <Sparkles className="w-4 h-4 text-slate-950" />
-                            <span>Confirm Match & Pay {pet.bountySol} SOL</span>
+                            <CheckCircle className="w-4 h-4" />
+                            Confirm & Pay {pet.bountySol} SOL
                           </button>
                         ) : (
-                          <div className="px-4 py-2 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold self-start sm:self-center flex items-center space-x-1.5">
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
-                            <span>Bounty Settled & Paid</span>
+                          <div className="px-3 py-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-center"
+                               style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                            Bounty Settled
                           </div>
                         )}
                       </div>
@@ -443,12 +391,10 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
                   </div>
                 </div>
               )}
-
             </div>
           );
         })}
       </div>
-
     </div>
   );
 };

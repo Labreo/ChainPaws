@@ -7,7 +7,6 @@ import {
   PawPrint,
   Hash,
   Shield,
-  Sparkles,
   Upload,
   CheckCircle2,
   ExternalLink,
@@ -15,7 +14,6 @@ import {
   AlertCircle,
   Cpu,
   Info,
-  Zap,
   RotateCcw,
 } from 'lucide-react';
 import { PetRecord, Species } from '@/types';
@@ -57,7 +55,6 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [registeredSuccessPet, setRegisteredSuccessPet] = useState<{ pet: PetRecord; sig: string } | null>(null);
 
-  // Suggested demo photo presets
   const sampleImages = [
     { label: 'Husky', breed: 'Siberian Husky', url: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80' },
     { label: 'French Bulldog', breed: 'French Bulldog', url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80' },
@@ -69,14 +66,12 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
 
   const activeSignerPubkey = publicKey || new PublicKey(demoWalletPubkey);
 
-  // Calculate live hash and PDA whenever microchip or wallet changes
   useEffect(() => {
     async function updatePda() {
       const chipInput = microchipId.trim() || 'SAMPLE-MICROCHIP-TAG-000';
       const { hex, bytes } = await calculateChipHash(chipInput);
       setChipHashHex(hex);
       setChipHashBytes(bytes);
-
       try {
         const { pda, bump } = derivePetPda(activeSignerPubkey, bytes);
         setDerivedPda(pda.toBase58());
@@ -121,7 +116,6 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
       let pdaAddress = derivedPda;
 
       if (publicKey) {
-        // Real Solana Devnet Transaction
         const result = await registerPetTransaction(
           connection,
           wallet as any,
@@ -140,7 +134,6 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
         signature = result.signature;
         pdaAddress = result.pdaAddress;
       } else {
-        // Instant Testnet Demo Signer
         signature = `5K2eB8uY1k9bLmNpRqTsVwXzAcEfGhIjKlMnOpQrStUvWxYz${Math.floor(Math.random() * 1000000)}`;
       }
 
@@ -168,7 +161,6 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
       setRegisteredSuccessPet({ pet: newPet, sig: signature });
       onPetRegistered(newPet, signature);
 
-      // Reset form fields
       setName('');
       setBreed('');
       setColor('');
@@ -187,98 +179,98 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      
-      {/* Header Info */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
-          <Shield className="w-3.5 h-3.5" />
-          <span>ON-CHAIN TAMPER-PROOF IDENTITY</span>
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Register New Companion
+
+      {/* ── Page Header ── */}
+      <div className="space-y-4">
+        <p className="label-eyebrow">On-Chain Identity Registration</p>
+        <h2 className="font-display text-3xl sm:text-4xl font-900 text-white tracking-tight"
+            style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900 }}>
+          Register a New Companion
         </h2>
-        <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-          Mint your pet&apos;s cryptographic identity directly to a Solana Program Derived Account (PDA). 
+        <p className="text-slate-300 text-sm leading-relaxed max-w-xl">
+          Mint your pet&apos;s cryptographic identity directly to a Solana Program Derived Account.
           Generates an immutable on-chain record and printable QR collar tag.
         </p>
 
-        {/* Quick Template loader bar */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs">
-          <span className="text-slate-400 font-medium">⚡ Instant Templates:</span>
+        {/* Quick templates */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider mr-1"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            Quick Load:
+          </span>
           {sampleImages.map((s) => (
             <button
               key={s.label}
               type="button"
               onClick={() => handleQuickTemplate(s)}
-              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-cyan-950/80 border border-slate-700 hover:border-cyan-500/50 text-slate-200 hover:text-cyan-300 font-bold transition-all shadow cursor-pointer"
+              className="btn-ghost px-3 py-1.5 text-xs"
             >
-              + {s.label}
+              {s.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Success Notification Banner */}
+      {/* ── Success Banner ── */}
       {registeredSuccessPet && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-emerald-950/90 border border-emerald-500/50 backdrop-blur-xl shadow-[0_0_50px_rgba(16,185,129,0.3)] space-y-4 animate-glow">
+        <div className="p-6 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 flex-shrink-0" />
+            <div className="flex items-center gap-4">
+              <CheckCircle2 className="w-8 h-8 text-emerald-400 flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-black text-white">
-                  🎉 {registeredSuccessPet.pet.name} is Protected on Solana!
+                <h4 className="text-lg font-bold text-white"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {registeredSuccessPet.pet.name} is Protected on Solana
                 </h4>
-                <p className="text-xs text-emerald-300 font-mono">
-                  Pet Record PDA: {registeredSuccessPet.pet.pdaAddress}
+                <p className="text-xs text-emerald-300 font-mono mt-0.5">
+                  PDA: {registeredSuccessPet.pet.pdaAddress}
                 </p>
               </div>
             </div>
             <button
-              onClick={() => {
-                onOpenQrModal(registeredSuccessPet.pet);
-                playSound('click');
-              }}
-              className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950 transition-all cursor-pointer"
+              onClick={() => { onOpenQrModal(registeredSuccessPet.pet); playSound('click'); }}
+              className="btn-primary"
             >
               <QrCode className="w-4 h-4" />
-              <span>Get Collar Tag</span>
+              Get Collar Tag
             </button>
           </div>
 
-          <div className="pt-3 border-t border-emerald-800/50 flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-emerald-200 gap-2">
+          <div className="pt-3 border-t border-emerald-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-emerald-300">
             <span>Transaction Signature:</span>
             <a
               href={getExplorerTxUrl(registeredSuccessPet.sig)}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline inline-flex items-center space-x-1 text-cyan-300 hover:text-white font-bold"
+              className="text-[#2ec4b6] hover:text-white flex items-center gap-1.5 font-bold transition-colors"
             >
-              <span>{shortenAddress(registeredSuccessPet.sig, 10)}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              {shortenAddress(registeredSuccessPet.sig, 10)}
+              <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
       )}
 
-      {/* Registration Form & Live Cryptographic Terminal */}
+      {/* ── Form + Terminal ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left 2 Cols: Form */}
-        <div className="lg:col-span-2 p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-white/10 backdrop-blur-2xl space-y-6 shadow-2xl">
-          
+
+        {/* Left: Form */}
+        <div className="lg:col-span-2 card p-6 sm:p-8 space-y-6">
+
           {error && (
-            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <div className="p-4 rounded-xl bg-red-950/60 border border-red-500/30 text-red-300 text-sm flex items-center gap-3">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            
-            {/* Pet Name & Species */}
+
+            {/* Name + Species */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   Companion Name *
                 </label>
                 <input
@@ -287,12 +279,13 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Atlas, Bella, Mochi"
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none transition-all font-medium"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   Species *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -301,23 +294,25 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                       key={sp}
                       type="button"
                       onClick={() => { setSpecies(sp); playSound('click'); }}
-                      className={`py-3 rounded-2xl text-xs font-bold capitalize transition-all cursor-pointer ${
+                      className={`py-2.5 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
                         species === sp
-                          ? 'bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(0,243,255,0.4)]'
-                          : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                          ? 'bg-[#2ec4b6] text-[#080c14]'
+                          : 'bg-[#080c14]/60 text-slate-400 hover:text-white border border-white/[0.07]'
                       }`}
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
                     >
-                      {sp === 'dog' ? '🐕 Dog' : sp === 'cat' ? '🐈 Cat' : '🐾 Other'}
+                      {sp === 'dog' ? 'Dog' : sp === 'cat' ? 'Cat' : 'Other'}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Breed & Color */}
+            {/* Breed + Color */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   Breed *
                 </label>
                 <input
@@ -326,12 +321,12 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                   value={breed}
                   onChange={(e) => setBreed(e.target.value)}
                   placeholder="e.g. Siberian Husky, Golden Retriever"
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none"
+                  className="input-field"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                       style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   Coat Color / Markings
                 </label>
                 <input
@@ -339,19 +334,20 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   placeholder="e.g. Silver & White, Bi-color eyes"
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none"
+                  className="input-field"
                 />
               </div>
             </div>
 
-            {/* Microchip ID / Smart Tag ID */}
+            {/* Microchip ID */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span className="flex items-center space-x-1.5">
-                  <Hash className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Microchip ISO 11784 ID or Collar Tag Number *</span>
+              <label className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                <span className="flex items-center gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-[#2ec4b6]" />
+                  Microchip ISO 11784 / Tag ID *
                 </span>
-                <span className="text-[11px] text-slate-400 font-mono">15-digit standard or custom</span>
+                <span className="text-[10px] text-slate-600 normal-case font-mono">15-digit or custom</span>
               </label>
               <input
                 type="text"
@@ -359,28 +355,30 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                 value={microchipId}
                 onChange={(e) => setMicrochipId(e.target.value)}
                 placeholder="e.g. 985141009823451 or TAG-SF-8891"
-                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm font-mono text-cyan-300 placeholder-slate-500 outline-none font-bold"
+                className="input-field font-mono text-[#2ec4b6]"
               />
             </div>
 
             {/* Photo URL */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-300 flex items-center space-x-1.5">
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 <Upload className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Pet Photo URL (or select sample image)</span>
+                Pet Photo URL
               </label>
               <input
                 type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://images.unsplash.com/photo-..."
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-xs font-mono text-white placeholder-slate-500 outline-none"
+                className="input-field font-mono text-xs"
               />
             </div>
 
             {/* Distinctive Features */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider"
+                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 Distinctive Features & Medical Notes
               </label>
               <textarea
@@ -388,66 +386,64 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                 value={distinctiveFeatures}
                 onChange={(e) => setDistinctiveFeatures(e.target.value)}
                 placeholder="e.g. Wearing red harness, chipped tooth, friendly, responds to whistle."
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-xs text-white placeholder-slate-500 outline-none resize-none"
+                className="input-field resize-none"
               />
             </div>
 
-            {/* Submit Action */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={isRegistering}
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 text-slate-950 font-black text-sm tracking-wide shadow-[0_0_35px_rgba(0,243,255,0.45)] hover:shadow-[0_0_45px_rgba(0,243,255,0.75)] hover:scale-[1.01] transition-all flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
+              className="btn-primary w-full py-3.5 text-sm"
             >
-              <Sparkles className="w-5 h-5 text-slate-950" />
-              <span>{isRegistering ? 'Minting Identity on Solana Devnet...' : 'Mint Pet Identity PDA on Solana'}</span>
+              {isRegistering ? 'Minting Identity on Solana Devnet...' : 'Mint Pet Identity PDA on Solana'}
             </button>
 
           </form>
         </div>
 
-        {/* Right 1 Col: Live Cryptographic PDA Derivation Preview Terminal */}
+        {/* Right: Terminal + Preview */}
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-slate-950 border border-cyan-500/30 space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-2 text-cyan-400 text-xs font-mono font-bold">
+
+          {/* PDA Derivation Terminal */}
+          <div className="terminal-block space-y-4">
+            <div className="flex items-center gap-2 text-[#2ec4b6] font-bold text-xs mb-2">
               <Cpu className="w-4 h-4" />
               <span>PDA DERIVATION TELEMETRY</span>
             </div>
 
-            {/* SHA-256 Hash Display */}
             <div className="space-y-1">
-              <div className="text-[11px] text-slate-400 font-mono">Microchip SHA-256 Digest:</div>
-              <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-cyan-300 break-all leading-tight">
+              <div className="text-slate-500 text-[10px]">Microchip SHA-256 Digest:</div>
+              <div className="text-[#2ec4b6] text-[10px] break-all leading-relaxed">
                 {chipHashHex || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}
               </div>
             </div>
 
-            {/* Program Seeds Diagram */}
             <div className="space-y-1">
-              <div className="text-[11px] text-slate-400 font-mono">Deterministic PDA Seeds:</div>
-              <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-[11px] font-mono space-y-1.5">
-                <div className="text-slate-400">1. Const: <span className="text-amber-300 font-bold">&quot;pet&quot;</span></div>
-                <div className="text-slate-400">2. Owner: <span className="text-purple-300 font-bold">{shortenAddress(activeSignerPubkey.toBase58(), 4)}</span></div>
-                <div className="text-slate-400">3. Hash: <span className="text-cyan-300 font-bold">{chipHashHex ? `${chipHashHex.slice(0, 10)}...` : '[u8; 32]'}</span></div>
+              <div className="text-slate-500 text-[10px]">PDA Seeds:</div>
+              <div className="space-y-1 text-[10px]">
+                <div className="text-slate-400">1. const: <span className="text-[#f4a261]">&quot;pet&quot;</span></div>
+                <div className="text-slate-400">2. owner: <span className="text-[#a78bfa]">{shortenAddress(activeSignerPubkey.toBase58(), 4)}</span></div>
+                <div className="text-slate-400">3. hash: <span className="text-[#2ec4b6]">{chipHashHex ? `${chipHashHex.slice(0, 10)}...` : '[u8; 32]'}</span></div>
               </div>
             </div>
 
-            {/* Derived Account Address */}
             <div className="space-y-1">
-              <div className="text-[11px] text-slate-400 font-mono">Target On-Chain Address (Bump {pdaBump}):</div>
-              <div className="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/50 text-xs font-mono text-cyan-300 break-all font-bold">
+              <div className="text-slate-500 text-[10px]">Target Address (Bump {pdaBump}):</div>
+              <div className="text-[#2ec4b6] text-[10px] break-all font-bold leading-relaxed">
                 {derivedPda || 'Deriving...'}
               </div>
             </div>
 
-            <div className="pt-2 flex items-center space-x-2 text-[11px] text-slate-400">
-              <Info className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+            <div className="flex items-start gap-1.5 pt-2 border-t border-[#2ec4b6]/20 text-[10px] text-slate-500">
+              <Info className="w-3 h-3 text-[#2ec4b6] flex-shrink-0 mt-0.5" />
               <span>Immutable storage rent paid once from owner wallet.</span>
             </div>
           </div>
 
           {/* Photo Preview */}
           {imageUrl && (
-            <div className="rounded-3xl overflow-hidden border border-white/10 relative h-52 shadow-xl">
+            <div className="rounded-xl overflow-hidden border border-white/[0.07] relative h-52">
               <Image
                 src={imageUrl}
                 alt="Pet Preview"
@@ -455,14 +451,13 @@ export const RegisterPetView: React.FC<RegisterPetViewProps> = ({
                 className="object-cover"
                 unoptimized
               />
-              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-xl bg-black/80 backdrop-blur-md text-xs text-white font-bold">
-                Photo Asset Preview
+              <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg bg-[#080c14]/90 text-[10px] text-slate-300 font-semibold backdrop-blur-sm">
+                Photo Preview
               </div>
             </div>
           )}
 
         </div>
-
       </div>
     </div>
   );

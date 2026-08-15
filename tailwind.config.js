@@ -9,46 +9,50 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#080c14",
-        card: "rgba(15, 23, 42, 0.75)",
-        cardBorder: "rgba(255, 255, 255, 0.08)",
-        primary: {
-          DEFAULT: "#00F3FF",
-          glow: "rgba(0, 243, 255, 0.35)",
-          dark: "#00b8c4",
+        // Deep navy palette — professional, editorial
+        navy: {
+          950: '#080c14',
+          900: '#0d1526',
+          800: '#111e36',
+          700: '#172645',
         },
-        secondary: {
-          DEFAULT: "#8B5CF6",
-          glow: "rgba(139, 92, 246, 0.35)",
+        // Refined teal — primary accent, replaces neon cyan
+        teal: {
+          400: '#2ec4b6',
+          500: '#1aab9b',
+          600: '#128a7c',
         },
-        accent: {
-          green: "#38FE5E",
-          amber: "#F59E0B",
-          rose: "#FF3366",
+        // Warm amber — secondary accent
+        amber: {
+          400: '#f4a261',
+          500: '#e76f51',
         },
+        // Neutral text
+        ink: {
+          primary: '#f1f5f9',
+          secondary: '#94a3b8',
+          muted: '#64748b',
+        },
+        // Solana accent (subdued)
         solana: {
-          purple: "#9945FF",
-          green: "#14F195",
+          purple: '#7c3aed',
+          green: '#059669',
         }
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-montserrat)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 4s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
+        'sweep': 'sweep 8s linear infinite',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-6px)' },
+        sweep: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         },
-        glow: {
-          '0%': { boxShadow: '0 0 15px rgba(0, 243, 255, 0.2)' },
-          '100%': { boxShadow: '0 0 30px rgba(0, 243, 255, 0.6)' },
-        }
       },
       backdropBlur: {
         xs: '2px',

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { X, Send, MapPin, User, MessageSquare, AlertCircle, ShieldCheck } from 'lucide-react';
+import { X, Send, MapPin, User, MessageSquare, AlertCircle, ShieldCheck, Check } from 'lucide-react';
 import { PetRecord, ClaimRecord } from '@/types';
 import { shortenAddress } from '@/lib/solana/pda';
 
@@ -57,11 +57,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-lg rounded-3xl bg-[#0d1424] border border-cyan-500/30 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,243,255,0.2)] overflow-hidden">
-        
-        {/* Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative w-full max-w-lg rounded-2xl bg-[#0d1526] border border-white/[0.1] p-6 sm:p-8 shadow-2xl overflow-hidden">
 
         {/* Close Button */}
         <button
@@ -72,29 +68,27 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
         </button>
 
         {/* Header */}
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 p-[1.5px]">
-            <div className="w-full h-full bg-[#0d1424] rounded-2xl flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-cyan-400" />
-            </div>
+        <div className="flex items-center gap-3.5 mb-6">
+          <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#2ec4b6]/10 border border-[#2ec4b6]/30 text-[#2ec4b6]">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="text-xl font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>
               Report Sighting / Claim Bounty
             </h3>
             <p className="text-xs text-slate-400">
-              Recovering <span className="text-cyan-300 font-semibold">{pet.name}</span> ({pet.breed})
+              Recovering <span className="text-[#2ec4b6] font-semibold">{pet.name}</span> ({pet.breed})
             </p>
           </div>
         </div>
 
         {/* Bounty Banner */}
-        <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+        <div className="mb-6 p-4 rounded-xl bg-[#f4a261]/10 border border-[#f4a261]/25 flex items-center justify-between">
           <div className="space-y-0.5">
-            <div className="text-xs text-amber-300 font-semibold uppercase tracking-wider">
+            <div className="text-xs text-[#f4a261] font-semibold uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
               Locked Escrow Reward
             </div>
-            <div className="text-2xl font-black text-amber-400 font-mono">
+            <div className="text-2xl font-black text-[#f4a261] font-mono">
               {pet.bountySol} SOL
             </div>
           </div>
@@ -105,8 +99,8 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="mb-4 p-3.5 rounded-xl bg-red-950/60 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
             <span>{error}</span>
           </div>
         )}
@@ -114,9 +108,9 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Finder Solana Wallet */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
-              <User className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Your Solana Payout Wallet Address *</span>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              <User className="w-3.5 h-3.5 text-[#2ec4b6]" />
+              <span>Your Solana Payout Wallet *</span>
             </label>
             <input
               type="text"
@@ -124,20 +118,20 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
               value={finderAddress}
               onChange={(e) => setFinderAddress(e.target.value)}
               placeholder="e.g. 4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-xs font-mono text-white placeholder-slate-500 outline-none transition-all"
+              className="input-field font-mono text-xs text-[#2ec4b6]"
             />
             {publicKey && finderAddress === publicKey.toBase58() && (
-              <span className="text-[11px] text-cyan-400 font-mono mt-1 inline-block">
-                ✓ Connected Phantom / Solflare wallet auto-filled
+              <span className="text-[11px] text-[#2ec4b6] font-mono mt-1 inline-flex items-center gap-1">
+                <Check className="w-3 h-3" /> Connected wallet auto-filled
               </span>
             )}
           </div>
 
-          {/* Sighting / Recovery Location */}
+          {/* Sighting Location */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
               <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Where did you find / spot {pet.name}? *</span>
+              <span>Where did you spot {pet.name}? *</span>
             </label>
             <input
               type="text"
@@ -145,14 +139,14 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
               value={foundLocation}
               onChange={(e) => setFoundLocation(e.target.value)}
               placeholder="e.g. 18th & Valencia St, Mission District, SF"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-sm text-white placeholder-slate-500 outline-none transition-all"
+              className="input-field"
             />
           </div>
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 Your Name (Optional)
               </label>
               <input
@@ -160,35 +154,35 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
                 value={finderName}
                 onChange={(e) => setFinderName(e.target.value)}
                 placeholder="Elena R."
-                className="w-full px-4 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none"
+                className="input-field"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Contact Phone / Telegram
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                Contact Phone / Email
               </label>
               <input
                 type="text"
                 value={contactInfo}
                 onChange={(e) => setContactInfo(e.target.value)}
-                placeholder="@elena_sol or 555-0192"
-                className="w-full px-4 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none"
+                placeholder="elena@mail.com or 555-0192"
+                className="input-field"
               />
             </div>
           </div>
 
-          {/* Description & Condition Notes */}
+          {/* Notes */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
-              <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
-              <span>Pet Condition / Message to Owner</span>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              <MessageSquare className="w-3.5 h-3.5 text-[#a78bfa]" />
+              <span>Pet Condition / Note to Owner</span>
             </label>
             <textarea
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Pet is safe with me at home. Healthy, has food and water. Ready for scan/handover."
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none resize-none"
+              placeholder="e.g. Pet is safe with me at home. Healthy, has food and water. Ready for handover."
+              className="input-field resize-none"
             />
           </div>
 
@@ -197,7 +191,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitCl
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 text-slate-950 font-bold text-sm tracking-wide shadow-[0_0_25px_rgba(0,243,255,0.4)] hover:shadow-[0_0_35px_rgba(0,243,255,0.7)] transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+              className="btn-primary w-full py-3.5 text-sm disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
               <span>{isSubmitting ? 'Submitting Recovery Claim...' : 'Submit Claim & Notify Owner'}</span>

@@ -88,7 +88,7 @@ export default function Home() {
     });
     addToast({
       type: 'success',
-      title: `🎉 ${newPet.name} Registered!`,
+      title: `${newPet.name} Registered on Solana`,
       description: `Immutable PetRecord PDA created on Solana Devnet.`,
       txSig,
     });
@@ -143,7 +143,7 @@ export default function Home() {
 
     addToast({
       type: 'warning',
-      title: `🚨 Missing Alert: ${pet.name}`,
+      title: `Missing Alert: ${pet.name}`,
       description: `Locked ${bountySol} SOL in Escrow Vault. Broadcast live on Radar.`,
       txSig: signature,
     });
@@ -173,7 +173,7 @@ export default function Home() {
 
     addToast({
       type: 'info',
-      title: `🎯 Sighting Claim Submitted!`,
+      title: `Sighting Claim Submitted`,
       description: `Finder report submitted for ${pet.name}. Owner can verify & disburse bounty.`,
     });
   };

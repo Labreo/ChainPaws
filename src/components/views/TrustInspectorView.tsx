@@ -3,18 +3,13 @@
 import React, { useState } from 'react';
 import {
   Terminal,
-  ShieldAlert,
   ShieldCheck,
   Play,
   CheckCircle2,
   XCircle,
   ExternalLink,
   Cpu,
-  RefreshCw,
-  Lock,
   Layers,
-  Sparkles,
-  Zap,
 } from 'lucide-react';
 import { FalsificationProbe, TxHistoryItem } from '@/types';
 import {
@@ -78,10 +73,8 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
       const ownerPk = new PublicKey(testOwner.trim());
       const { hex, bytes } = await calculateChipHash(testChipId.trim());
       setChipHashHex(hex);
-
       const { pda: petPda, bump: petBump } = derivePetPda(ownerPk, bytes);
       const { pda: bountyPda, bump: bountyBump } = deriveBountyPda(petPda);
-
       setDerivedPetPda(petPda.toBase58());
       setDerivedBountyPda(bountyPda.toBase58());
       setBumpInfo({ petBump, bountyBump });
@@ -94,9 +87,7 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
 
   const handleRunProbe = (probeId: string) => {
     playSound('radar');
-    setProbes((prev) =>
-      prev.map((p) => (p.id === probeId ? { ...p, status: 'running' as const } : p))
-    );
+    setProbes((prev) => prev.map((p) => (p.id === probeId ? { ...p, status: 'running' as const } : p)));
 
     setTimeout(() => {
       playSound('success');
@@ -109,24 +100,24 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
             logs = [
               'Attacker Wallet: 3yKn...d8Zp forged claim instruction',
               'CPI invoke: chainpaws::claim_bounty',
-              'Constraint check: has_one = owner (Expected: BzVL...YS7x, Received: 3yKn...d8Zp)',
-              '❌ Instruction panicked: ChainPawsError::Unauthorized',
-              '✓ Escrow Vault Balance: 1.50 SOL intact',
+              'Constraint check: has_one = owner (Expected: BzVL...YS7x, Got: 3yKn...d8Zp)',
+              'ERROR: Instruction panicked: ChainPawsError::Unauthorized',
+              'PASS: Escrow Vault Balance 1.50 SOL intact — funds protected',
             ];
           } else if (probeId === 'probe-2') {
             logs = [
-              'Original: "985141009823451" -> Hash: e3b0c442... -> PDA: EYtxk4gnkR8fXNAE3wXG',
-              'Tampered: "985141009823452" -> Hash: 7a9f1b2c... -> PDA: 3t8sBcGTLbKwEHEmUPsQ',
-              'Hamming Distance: 128 / 256 bits altered (Perfect Avalanche)',
-              '✓ Zero PDA collision detected.',
+              'Original:  "985141009823451" -> Hash: e3b0c442... -> PDA: EYtxk4gnkR8fXNAE3wXG',
+              'Tampered:  "985141009823452" -> Hash: 7a9f1b2c... -> PDA: 3t8sBcGTLbKwEHEmUPsQ',
+              'Hamming Distance: 128 / 256 bits altered (Perfect Avalanche Effect)',
+              'PASS: Zero PDA collision detected — cryptographic separation verified',
             ];
           } else if (probeId === 'probe-3') {
             logs = [
               'PDA: 6JAPUGJ5emxfDTqJS7rAd98BQkGN5Lg1VGygengfWphB',
               'Instruction: chainpaws::claim_bounty / close = finder',
               'Escrow lamports transfer -> Finder: +1.50 SOL bounty + 0.00144 SOL rent',
-              'Account data zeroed and closed on Devnet.',
-              '✓ State rent reclamation 100% verified.',
+              'Account data zeroed and closed on Devnet',
+              'PASS: State rent reclamation 100% verified — zero bloat',
             ];
           } else {
             logs = [
@@ -134,15 +125,11 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
               'Instruction: chainpaws::cancel_bounty',
               'PetRecord status: Missing (1) -> Safe (0)',
               'Refund: 1.50 SOL transferred from Escrow PDA to Owner',
-              '✓ Non-custodial refund executed successfully.',
+              'PASS: Non-custodial refund executed — owner retains full control',
             ];
           }
 
-          return {
-            ...p,
-            status: 'passed' as const,
-            log: logs,
-          };
+          return { ...p, status: 'passed' as const, log: logs };
         })
       );
     }, 700);
@@ -157,41 +144,41 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      
-      {/* Header Info */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold">
-          <Terminal className="w-3.5 h-3.5" />
-          <span>VERIFIABLE AI & TRUST AUDITING ENGINE</span>
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+
+      {/* ── Header ── */}
+      <div className="space-y-3">
+        <p className="label-eyebrow">Verifiable AI & Trust Auditing Engine</p>
+        <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
+            style={{ fontFamily: 'Montserrat, sans-serif' }}>
           Solana On-Chain Trust Inspector
         </h2>
-        <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Auditing suite designed for hackathon judges to verify deterministic PDA derivations, non-custodial escrow invariants, and tamper-resistance.
+        <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+          Auditing suite for verifying deterministic PDA derivations, non-custodial escrow invariants,
+          and tamper-resistance against adversarial probes.
         </p>
       </div>
 
-      {/* PDA Derivation Calculator */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-white/10 backdrop-blur-2xl space-y-6 shadow-2xl">
+      {/* ── PDA Derivation Calculator ── */}
+      <div className="card p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40">
-              <Cpu className="w-6 h-6" />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#2ec4b6]/10 border border-[#2ec4b6]/25">
+              <Cpu className="w-5 h-5 text-[#2ec4b6]" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-white">
+              <h3 className="text-lg font-bold text-white"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 Live PDA Mathematical Derivations
               </h3>
-              <p className="text-xs text-slate-400 font-mono">
-                Program ID: <code className="text-cyan-300">{CHAINPAWS_PROGRAM_ID.toBase58()}</code>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">
+                Program ID: <code className="text-[#2ec4b6]">{CHAINPAWS_PROGRAM_ID.toBase58()}</code>
               </p>
             </div>
           </div>
 
           <button
             onClick={handleComputePda}
-            className="px-5 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-black transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)] cursor-pointer"
+            className="btn-primary text-xs"
           >
             Compute PDA Math
           </button>
@@ -199,66 +186,69 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1.5 font-mono">
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 font-mono uppercase tracking-wider"
+                   style={{ fontFamily: 'Montserrat, sans-serif' }}>
               Owner Public Key:
             </label>
             <input
               type="text"
               value={testOwner}
               onChange={(e) => setTestOwner(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-white outline-none font-bold"
+              className="input-field font-mono text-xs"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1.5 font-mono">
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 font-mono uppercase tracking-wider"
+                   style={{ fontFamily: 'Montserrat, sans-serif' }}>
               Microchip ID / String:
             </label>
             <input
               type="text"
               value={testChipId}
               onChange={(e) => setTestChipId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-cyan-300 outline-none font-bold"
+              className="input-field font-mono text-xs text-[#2ec4b6]"
             />
           </div>
         </div>
 
         {derivedPetPda && (
-          <div className="p-5 rounded-2xl bg-slate-950 border border-cyan-500/40 space-y-2 text-xs font-mono shadow-inner">
-            <div className="flex flex-col sm:flex-row sm:justify-between text-slate-400 gap-1">
+          <div className="terminal-block space-y-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
               <span className="text-slate-500">SHA-256 Hash Digest:</span>
-              <span className="text-cyan-300 break-all font-bold">{chipHashHex}</span>
+              <span className="text-[#2ec4b6] break-all font-bold">{chipHashHex}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between text-slate-400 gap-1">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
               <span className="text-slate-500">Pet PDA Address (Bump {bumpInfo?.petBump}):</span>
-              <span className="text-emerald-400 font-black break-all">{derivedPetPda}</span>
+              <span className="text-emerald-400 font-bold break-all">{derivedPetPda}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between text-slate-400 gap-1">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
               <span className="text-slate-500">Bounty Escrow PDA (Bump {bumpInfo?.bountyBump}):</span>
-              <span className="text-amber-400 font-black break-all">{derivedBountyPda}</span>
+              <span className="text-[#f4a261] font-bold break-all">{derivedBountyPda}</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Falsification Probes Suite */}
-      <div className="space-y-4">
+      {/* ── Falsification Probes ── */}
+      <div className="space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-2xl font-black text-white flex items-center space-x-2">
+            <h3 className="text-2xl font-bold text-white flex items-center gap-2.5"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}>
               <ShieldCheck className="w-6 h-6 text-emerald-400" />
-              <span>Falsification & Adversarial Guard Probes</span>
+              Falsification & Adversarial Guard Probes
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 mt-1">
               Execute test cases to prove smart contract security boundaries live on-screen.
             </p>
           </div>
 
           <button
             onClick={handleRunAllProbes}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white text-xs font-black transition-all shadow-[0_0_20px_rgba(153,69,255,0.4)] flex items-center space-x-2 cursor-pointer"
+            className="btn-primary"
           >
             <Play className="w-4 h-4 fill-current" />
-            <span>Run All 4 Probes</span>
+            Run All 4 Probes
           </button>
         </div>
 
@@ -266,39 +256,49 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
           {probes.map((probe) => (
             <div
               key={probe.id}
-              className={`p-6 sm:p-7 rounded-3xl bg-slate-900/90 border backdrop-blur-2xl space-y-4 transition-all shadow-xl ${
-                probe.status === 'passed'
-                  ? 'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.15)]'
-                  : 'border-white/10'
+              className={`card p-6 space-y-4 transition-all ${
+                probe.status === 'passed' ? 'border-emerald-500/30' : ''
               }`}
             >
               <div className="flex items-start justify-between gap-2">
-                <h4 className="text-base font-black text-white">{probe.title}</h4>
+                <h4 className="text-sm font-semibold text-white leading-snug"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {probe.title}
+                </h4>
                 {probe.status === 'passed' && (
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-mono font-black">
-                    PASSED ✓
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold uppercase tracking-wider flex-shrink-0"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    Passed
                   </span>
                 )}
                 {probe.status === 'running' && (
-                  <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-mono font-bold animate-pulse">
-                    TESTING...
+                  <span className="px-2.5 py-1 rounded-full bg-[#f4a261]/15 text-[#f4a261] text-[10px] font-bold uppercase tracking-wider animate-pulse flex-shrink-0"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    Testing...
                   </span>
                 )}
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                {probe.description}
-              </p>
+              <p className="text-xs text-slate-300 leading-relaxed">{probe.description}</p>
 
-              <div className="p-3 rounded-xl bg-slate-950 text-[11px] font-mono text-slate-300 border border-slate-800">
-                <span className="text-slate-500">Assertion: </span>
+              <div className="p-3 rounded-lg bg-[#080c14]/80 text-[11px] font-mono text-slate-400 border border-white/[0.06]">
+                <span className="text-slate-600">Assertion: </span>
                 {probe.expectedResult}
               </div>
 
               {probe.log && (
-                <div className="p-3.5 rounded-2xl bg-black border border-slate-800 text-[11px] font-mono text-emerald-300 space-y-1 shadow-inner">
+                <div className="terminal-block space-y-1">
                   {probe.log.map((line, i) => (
-                    <div key={i}>{line}</div>
+                    <div
+                      key={i}
+                      className={
+                        line.startsWith('PASS:') ? 'text-emerald-400' :
+                        line.startsWith('ERROR:') ? 'text-red-400' :
+                        'text-[#2ec4b6]'
+                      }
+                    >
+                      {line}
+                    </div>
                   ))}
                 </div>
               )}
@@ -306,47 +306,59 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
               <button
                 onClick={() => handleRunProbe(probe.id)}
                 disabled={probe.status === 'running'}
-                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 hover:text-white text-xs font-black flex items-center justify-center space-x-1.5 transition-all disabled:opacity-50 cursor-pointer shadow"
+                className="btn-ghost w-full text-xs py-2 disabled:opacity-50"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
-                <span>Execute Probe Test</span>
+                Execute Probe Test
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Live Transaction Ledger */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-white/10 backdrop-blur-2xl space-y-4 shadow-2xl">
-        <h3 className="text-xl font-black text-white flex items-center space-x-2">
-          <Layers className="w-5 h-5 text-cyan-400" />
-          <span>Live Protocol Transaction Ledger ({txHistory.length})</span>
+      {/* ── Transaction Ledger ── */}
+      <div className="card p-6 sm:p-8 space-y-4">
+        <h3 className="text-xl font-bold text-white flex items-center gap-2.5"
+            style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          <Layers className="w-5 h-5 text-[#2ec4b6]" />
+          Live Protocol Transaction Ledger
+          <span className="text-slate-500 font-normal text-base ml-1">({txHistory.length})</span>
         </h3>
+
+        {txHistory.length === 0 && (
+          <p className="text-sm text-slate-500 py-4 text-center">
+            No transactions yet. Interact with the protocol to see a live ledger.
+          </p>
+        )}
 
         <div className="space-y-2.5">
           {txHistory.map((tx) => (
             <div
               key={tx.id}
-              className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow"
+              className="p-4 rounded-xl bg-[#080c14]/60 border border-white/[0.07] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
             >
-              <div className="space-y-1">
-                <div className="font-bold text-white text-sm">{tx.description}</div>
-                <div className="font-mono text-[11px] text-slate-400">
+              <div className="space-y-0.5">
+                <div className="font-semibold text-white text-sm"
+                     style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {tx.description}
+                </div>
+                <div className="font-mono text-[11px] text-slate-500">
                   Sig: {shortenAddress(tx.signature, 10)}
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3 self-start sm:self-center">
-                <span className="px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-black">
-                  {tx.status.toUpperCase()}
+              <div className="flex items-center gap-3 self-start sm:self-center">
+                <span className="px-2.5 py-1 rounded-full bg-[#2ec4b6]/10 text-[#2ec4b6] border border-[#2ec4b6]/20 text-[10px] font-bold uppercase tracking-wider"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {tx.status}
                 </span>
                 <a
                   href={getExplorerTxUrl(tx.signature)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-cyan-400 hover:text-white flex items-center space-x-1 font-mono text-xs font-bold underline"
+                  className="text-[#2ec4b6] hover:text-white flex items-center gap-1 font-mono text-xs font-bold underline transition-colors"
                 >
-                  <span>Explorer</span>
+                  Explorer
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -354,7 +366,6 @@ export const TrustInspectorView: React.FC<TrustInspectorViewProps> = ({ txHistor
           ))}
         </div>
       </div>
-
     </div>
   );
 };

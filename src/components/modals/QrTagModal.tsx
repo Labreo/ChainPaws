@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { X, Download, Printer, ShieldCheck, Sparkles, ExternalLink } from 'lucide-react';
+import { X, Printer, ShieldCheck, ExternalLink } from 'lucide-react';
 import { PetRecord } from '@/types';
 import { shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
 
@@ -26,10 +26,7 @@ export const QrTagModal: React.FC<QrTagModalProps> = ({ pet, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md print:bg-white print:p-0">
-      <div className="relative w-full max-w-md rounded-3xl bg-[#0d1424] border border-cyan-500/40 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,243,255,0.25)] overflow-hidden print:border-none print:shadow-none print:bg-white print:text-black">
-        
-        {/* Ambient Glow */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none print:hidden" />
+      <div className="relative w-full max-w-md rounded-2xl bg-[#0d1526] border border-white/[0.1] p-6 sm:p-8 shadow-2xl overflow-hidden print:border-none print:shadow-none print:bg-white print:text-black">
 
         {/* Close Button */}
         <button
@@ -41,25 +38,24 @@ export const QrTagModal: React.FC<QrTagModalProps> = ({ pet, onClose }) => {
 
         {/* Header */}
         <div className="text-center mb-6 print:mb-4">
-          <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-semibold mb-2 print:text-black print:border-black">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>SOLANA IMMUTABLE COLLAR TAG</span>
-          </div>
-          <h3 className="text-2xl font-black text-white print:text-black">
+          <p className="label-eyebrow justify-center mb-2 print:text-black">
+            Solana Immutable Collar Tag
+          </p>
+          <h3 className="text-2xl font-bold text-white print:text-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             {pet.name}
           </h3>
-          <p className="text-xs text-slate-400 print:text-gray-600">
-            {pet.breed} • {pet.species.toUpperCase()}
+          <p className="text-xs text-slate-400 print:text-gray-600 mt-0.5">
+            {pet.breed} — {pet.species.toUpperCase()}
           </p>
         </div>
 
         {/* Printable Card Area */}
         <div
           ref={printRef}
-          className="p-6 rounded-2xl bg-gradient-to-b from-slate-900 to-[#080c14] border border-white/10 text-center space-y-4 print:bg-white print:border-2 print:border-black print:text-black"
+          className="p-6 rounded-xl bg-[#080c14] border border-white/[0.08] text-center space-y-4 print:bg-white print:border-2 print:border-black print:text-black"
         >
           {/* QR Code */}
-          <div className="inline-block p-4 rounded-2xl bg-white shadow-lg">
+          <div className="inline-block p-4 rounded-xl bg-white shadow-md">
             <QRCodeSVG
               value={petProfileUrl}
               size={180}
@@ -70,11 +66,11 @@ export const QrTagModal: React.FC<QrTagModalProps> = ({ pet, onClose }) => {
             />
           </div>
 
-          <p className="text-xs text-cyan-300 font-medium print:text-black">
+          <p className="text-xs text-[#2ec4b6] font-semibold print:text-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             Scan to view On-Chain Identity & Escrow Bounty
           </p>
 
-          <div className="space-y-1 text-left p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] font-mono print:bg-gray-100 print:border-gray-300">
+          <div className="space-y-1.5 text-left p-3.5 rounded-lg bg-[#0d1526] border border-white/[0.06] text-[11px] font-mono print:bg-gray-100 print:border-gray-300">
             <div className="flex justify-between">
               <span className="text-slate-500 print:text-gray-600">Microchip Hash:</span>
               <span className="text-slate-300 font-semibold print:text-black">
@@ -83,7 +79,7 @@ export const QrTagModal: React.FC<QrTagModalProps> = ({ pet, onClose }) => {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 print:text-gray-600">Pet Record PDA:</span>
-              <span className="text-cyan-400 font-semibold print:text-black">
+              <span className="text-[#2ec4b6] font-semibold print:text-black">
                 {shortenAddress(pet.pdaAddress, 5)}
               </span>
             </div>
@@ -97,20 +93,20 @@ export const QrTagModal: React.FC<QrTagModalProps> = ({ pet, onClose }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-6 flex items-center space-x-3 print:hidden">
+        <div className="mt-6 flex items-center gap-3 print:hidden">
           <button
             onClick={handlePrint}
-            className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
+            className="btn-ghost flex-1 py-2.5 text-xs"
           >
             <Printer className="w-4 h-4" />
             <span>Print Collar Tag</span>
           </button>
-          
+
           <a
             href={getExplorerAddressUrl(pet.pdaAddress)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-3 px-4 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
+            className="btn-primary flex-1 py-2.5 text-xs"
           >
             <span>Explorer</span>
             <ExternalLink className="w-3.5 h-3.5" />

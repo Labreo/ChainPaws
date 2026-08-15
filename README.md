@@ -1,4 +1,4 @@
-# 🐾 ChainPaws — Decentralized Pet Registry & Escrow Recovery Network on Solana
+# ChainPaws — Decentralized Pet Registry & Escrow Recovery Network on Solana
 
 [![Solana Devnet](https://img.shields.io/badge/Solana-Devnet-14F195?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
 [![Anchor Framework](https://img.shields.io/badge/Anchor-0.30.1-9945FF?style=for-the-badge)](https://coral-xyz.github.io/anchor/)
@@ -9,7 +9,7 @@
 
 ---
 
-## 🐶 1. Problem & Value Proposition
+## 1. Problem & Value Proposition
 
 Millions of household pets go missing annually. Traditional recovery systems suffer from three critical points of failure:
 1. **Siloed & Manipulable Registries:** Microchip databases are fragmented across proprietary vendors, slow to update across jurisdictions, and vulnerable to centralized record modification.
@@ -18,7 +18,7 @@ Millions of household pets go missing annually. Traditional recovery systems suf
 
 ---
 
-## ⚡ 2. The Solana Solution: Immutable Identity & Trustless Escrow
+## 2. The Solana Solution: Immutable Identity & Trustless Escrow
 
 ChainPaws solves this by combining **on-chain Program Derived Accounts (PDAs)** with **non-custodial SOL escrow vaults**:
 
@@ -54,7 +54,7 @@ ChainPaws solves this by combining **on-chain Program Derived Accounts (PDAs)** 
 
 ---
 
-## 🏛️ 3. Program Derived Account (PDA) Seeds
+## 3. Program Derived Account (PDA) Seeds
 
 | Account Type | Seed Derivation | Stored Fields & Purpose |
 | :--- | :--- | :--- |
@@ -64,16 +64,16 @@ ChainPaws solves this by combining **on-chain Program Derived Accounts (PDAs)** 
 
 ---
 
-## 🛠️ 4. Tech Stack & Architecture
+## 4. Tech Stack & Architecture
 
 - **Smart Contracts:** Rust, Solana Anchor Framework `0.30.1` (`PAWS9q8W5aYh7YgA82bQJg7Xf8M3g9Z9123456789abc`)
-- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion, Canvas Confetti
+- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, Canvas Confetti
 - **Solana Client:** `@solana/web3.js`, `@solana/wallet-adapter-react`, `@solana/wallet-adapter-react-ui`, `@solana/wallet-adapter-wallets`
 - **Identity Tags:** SVG/Canvas QR Generator for printable collar tags linking directly to on-chain Pet PDAs
 
 ---
 
-## 🚀 5. Getting Started Locally
+## 5. Getting Started Locally
 
 ### Prerequisites
 - Node.js `v20+` or `v22+`
@@ -98,7 +98,7 @@ Open [http://localhost:3005](http://localhost:3005) in your browser.
 
 ---
 
-## 🧪 6. Testing & Falsification Auditing
+## 6. Testing & Falsification Auditing
 
 ### Anchor Unit & PDA Derivation Tests
 ```bash
@@ -114,5 +114,5 @@ Visit the **Trust Inspector** tab in the UI to run live adversarial probes:
 
 ---
 
-## 📄 License
+## License
 MIT © 2026 ChainPaws Team
