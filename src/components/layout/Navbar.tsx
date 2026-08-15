@@ -10,11 +10,10 @@ import {
   ShieldCheck,
   Building2,
   Terminal,
-  Droplet,
   Coins,
   Award,
 } from 'lucide-react';
-import { requestDevnetAirdrop, getSolBalance } from '@/lib/solana/service';
+import { getSolBalance } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
 
 const WalletMultiButton = dynamic(
@@ -35,24 +34,25 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
-  onAirdropSuccess,
   missingCount,
 }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
-  const [isAirdropping, setIsAirdropping] = useState(false);
-  const [airdropMsg, setAirdropMsg] = useState<string | null>(null);
   const [solBalance, setSolBalance] = useState<number | null>(null);
 
-  // Fetch real SOL balance from Solana Devnet RPC
+  // Fetch real SOL balance from Solana Devnet RPC when wallet is connected
   useEffect(() => {
     let isMounted = true;
     async function updateBalance() {
       if (publicKey) {
-        const bal = await getSolBalance(connection, publicKey);
-        if (isMounted) setSolBalance(bal);
+        try {
+          const bal = await getSolBalance(connection, publicKey);
+          if (isMounted) setSolBalance(bal);
+        } catch {
+          if (isMounted) setSolBalance(null);
+        }
       } else {
-        if (isMounted) setSolBalance(3.45);
+        if (isMounted) setSolBalance(null);
       }
     }
     updateBalance();
@@ -63,55 +63,28 @@ export const Navbar: React.FC<NavbarProps> = ({
     };
   }, [publicKey, connection]);
 
-  const handleAirdrop = async () => {
-    setIsAirdropping(true);
-    setAirdropMsg(null);
-    try {
-      if (publicKey) {
-        const sig = await requestDevnetAirdrop(connection, publicKey, 1);
-        setAirdropMsg('+1 SOL');
-        if (onAirdropSuccess) onAirdropSuccess(sig);
-        const newBal = await getSolBalance(connection, publicKey);
-        setSolBalance(newBal);
-      } else {
-        setAirdropMsg('+1 SOL');
-        setSolBalance((prev) => (prev !== null ? prev + 1 : 4.45));
-        if (onAirdropSuccess) {
-          onAirdropSuccess('5K2eB8uY1k9bLmNpRqTsVwXzAcEfGhIjKlMnOpQrStUvWxYz123456789abcdefghij');
-        }
-      }
-      playSound('success');
-      setTimeout(() => setAirdropMsg(null), 3000);
-    } catch {
-      setAirdropMsg('Faucet Busy');
-      setTimeout(() => setAirdropMsg(null), 3000);
-    } finally {
-      setIsAirdropping(false);
-    }
-  };
-
   const navItems = [
-    { id: 'radar', label: 'Live Map & Alerts', icon: Radio, count: missingCount > 0 ? missingCount : null },
-    { id: 'register', label: 'Register Pet', icon: PlusCircle },
+    { id: 'radar', label: 'Live Map', icon: Radio, count: missingCount > 0 ? missingCount : null },
+    { id: 'register', label: 'Register', icon: PlusCircle },
     { id: 'mypets', label: 'My Pets', icon: ShieldCheck },
-    { id: 'badges', label: 'Badges & Impact', icon: Award },
+    { id: 'badges', label: 'Badges', icon: Award },
     { id: 'clinic', label: 'Clinic Portal', icon: Building2 },
     { id: 'trust', label: 'Trust Audit', icon: Terminal },
   ];
 
   return (
-    <header className="sticky top-0 z-[9999] w-full border-b border-white/[0.08] bg-[#080c14]/95 backdrop-blur-2xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-[9999] w-full border-b border-white/[0.08] bg-[#080c14]/95 backdrop-blur-2xl transition-all">
+      <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Bar */}
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-18 py-3 gap-3 md:gap-6">
 
           {/* Left: Brand Identity */}
           <button
             onClick={() => { setActiveTab('radar'); playSound('click'); }}
-            className="flex items-center gap-3 group text-left flex-shrink-0"
+            className="flex items-center gap-3 group text-left flex-shrink-0 cursor-pointer"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#2ec4b6]/10 border border-[#2ec4b6]/30 text-[#2ec4b6] group-hover:bg-[#2ec4b6]/20 transition-colors">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#2ec4b6]/10 border border-[#2ec4b6]/30 text-[#2ec4b6] group-hover:bg-[#2ec4b6]/20 transition-all shadow-sm">
               <PawPrint className="w-5 h-5" />
             </div>
             <div>
@@ -124,26 +97,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </button>
 
-          {/* Center: Desktop Navigation Tabs */}
-          <nav className="hidden lg:flex items-center p-1 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+          {/* Center: Desktop Navigation Tabs (Spacious & Clean) */}
+          <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/[0.07] flex-shrink-0">
             {navItems.map(({ id, label, icon: Icon, count }) => {
               const isActive = activeTab === id;
               return (
                 <button
                   key={id}
                   onClick={() => { setActiveTab(id); playSound('click'); }}
-                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'text-[#080c14] bg-[#2ec4b6] shadow-sm font-bold'
-                      : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                      ? 'text-[#080c14] bg-[#2ec4b6] shadow-sm font-bold scale-[1.02]'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.05]'
                   }`}
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{label}</span>
                   {count !== null && count !== undefined && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold font-mono min-w-[18px] text-center ${
-                      isActive ? 'bg-[#080c14] text-[#2ec4b6]' : 'bg-red-600 text-white'
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono min-w-[18px] text-center leading-none ${
+                      isActive ? 'bg-[#080c14] text-[#2ec4b6]' : 'bg-red-500/90 text-white shadow-sm animate-pulse'
                     }`}>
                       {count}
                     </span>
@@ -153,18 +126,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Right: Network Status, Faucet & Wallet */}
-          <div className="flex items-center gap-2.5 flex-shrink-0">
+          {/* Right: Network Status & Wallet */}
+          <div className="flex items-center gap-3 flex-shrink-0">
 
             {/* Devnet Cluster Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.07] text-[11px] font-mono text-slate-300">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[11px] font-mono text-slate-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Devnet</span>
             </div>
 
-            {/* Real SOL Balance readout */}
+            {/* Connected SOL Balance (only appears when wallet is connected) */}
             {solBalance !== null && (
-              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#f4a261]/10 border border-[#f4a261]/25 text-[11px] font-mono text-[#f4a261] font-bold">
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f4a261]/10 border border-[#f4a261]/25 text-[11px] font-mono text-[#f4a261] font-bold">
                 <Coins className="w-3.5 h-3.5" />
                 <span>{solBalance.toFixed(2)} SOL</span>
               </div>
@@ -178,15 +151,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation Strip */}
-        <div className="lg:hidden flex items-center gap-1 pb-2.5 overflow-x-auto border-t border-white/[0.06] pt-2">
+        {/* Mobile / Tablet Navigation Strip */}
+        <div className="lg:hidden flex items-center gap-1.5 pb-2.5 overflow-x-auto border-t border-white/[0.06] pt-2 scrollbar-none">
           {navItems.map(({ id, label, icon: Icon, count }) => {
             const isActive = activeTab === id;
             return (
               <button
                 key={id}
                 onClick={() => { setActiveTab(id); playSound('click'); }}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-[#2ec4b6] text-[#080c14] font-bold'
                     : 'text-slate-400 hover:text-white bg-white/[0.03]'
@@ -196,8 +169,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Icon className="w-3.5 h-3.5" />
                 <span>{label}</span>
                 {count !== null && count !== undefined && (
-                  <span className={`px-1 rounded-full text-[9px] font-bold ${
-                    isActive ? 'bg-[#080c14] text-[#2ec4b6]' : 'bg-red-600 text-white'
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                    isActive ? 'bg-[#080c14] text-[#2ec4b6]' : 'bg-red-500 text-white'
                   }`}>
                     {count}
                   </span>
