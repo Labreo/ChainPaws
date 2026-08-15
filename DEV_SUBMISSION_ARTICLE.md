@@ -283,15 +283,8 @@ When an animal is wandering near a busy road, waiting 15 minutes for block confi
 - **Native Wallet & RPC Layer:** Direct Devnet balance streaming, Phantom/Solflare adapter support, and deterministic cryptographic testing.
 - **Guardian Badges & Collective Rescue Network:** Gamified on-chain achievement milestones and network-wide impact metrics.
 
-<!-- 
-OPTIONAL ADDITIONAL CATEGORIES:
-If you integrated any of the other sponsor tools, keep them below. Otherwise, they can be removed or kept as future roadmap integrations.
--->
-<!--
-- **Best Use of Google AI** — [OPTIONAL: Describe any Gemini integration for pet breed visual recognition or automated alert generation]
-- **Best Use of ElevenLabs** — [OPTIONAL: Describe any ElevenLabs voice synthesis integration for emergency search broadcasts]
-- **Best Use of Snowflake** — [OPTIONAL: Describe any Snowflake data lake analytics for nationwide pet recovery telemetry]
--->
+### 🤖 Best Use of Google AI
+- **Gemini 2.5 Flash Dynamic Multilingual Pipeline (`/api/translate`):** Translates arbitrary companion traits, medical urgency tags, and neighborhood search bulletins in real time across 5 languages (*English, Español, Français, 中文, 日本語*) on demand, with serverless edge caching for instant neighborhood mobilization.
 
 ---
 
