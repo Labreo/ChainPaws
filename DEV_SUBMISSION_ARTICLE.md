@@ -14,7 +14,9 @@ I built **ChainPaws** to turn that broken, fear-driven process into an immutable
 
 - **Immutable On-Chain Identity:** Binds your companion's 15-digit ISO 11784/11785 microchip number directly to your Solana wallet using deterministic **Program Derived Accounts (PDAs)**. Generates printable QR smart collar tags for instantaneous smartphone scanning.
 - **Trustless Non-Custodial Escrow Bounties:** When a companion goes missing, owners deposit a SOL reward into an autonomous PDA vault (`["bounty", pet_pda]`). Finders and good Samaritans are guaranteed payout upon verified microchip identification, eliminating ransom scams and false claims.
-- **Live OpenStreetMap Telemetry:** A real-time geographic radar mapping missing companions across 7 major metropolitan hubs with animated pulse alerts, street-level accuracy, and one-click sighting submissions.
+- **Live OpenStreetMap Telemetry:** A real-time geographic radar mapping missing companions across 7 major metropolitan hubs (SF, LA, Austin, Seattle, NY, Chicago, Miami) with animated pulse alerts, street-level accuracy, and one-click sighting submissions.
+- **AI Multilingual Emergency Bulletin & Voice Siren:** Generates printable high-visibility emergency flyers in 5 languages (English, Spanish, French, Mandarin, Japanese) with real-time browser speech synthesis voice alerts.
+- **Guardian Badges & Collective Rescue Impact Network:** Gamified on-chain achievement badges (*Guardian Genesis, Bounty Sentinel, First Responder, Reunion Champion*) and a live macro dashboard tracking network-wide SOL escrowed and safe reunifications.
 - **Veterinary & Shelter Verification Portal:** Enables licensed clinics and shelters to scan RFID microchips or NFC collar tags and facilitate trustless handovers without centralized middlemen.
 - **Trust & Falsification Inspector:** An interactive security terminal enabling hackathon judges and auditors to execute real-time cryptographic falsification probes against smart contract invariants.
 
@@ -33,10 +35,11 @@ I built **ChainPaws** to turn that broken, fear-driven process into an immutable
 
 1. **Explore the Live Map:** Navigate the OpenStreetMap radar across San Francisco, Los Angeles, Austin, Seattle, New York, Chicago, or Miami. Click any pulsing pet pin to view verified location telemetry and microchip hashes.
 2. **Register a Companion:** Head to **Register Pet**, pick a breed template (e.g. Siberian Husky, French Bulldog, Scottish Fold), enter an ISO microchip number, and mint your pet's on-chain identity PDA on Solana Devnet.
-3. **Generate Collar Tag:** Click **Collar Tag** to generate a printable QR badge with high-contrast safety instructions.
+3. **Generate Multilingual Bulletin & Voice Siren:** Open any missing pet card and click the flyer icon to generate a 5-language emergency poster and listen to the AI speech broadcast siren.
 4. **Lock an Escrow Bounty:** On **My Pets**, click **Report Missing & Lock Reward**. Specify the last seen location and deposit 1.5 SOL into the non-custodial escrow vault.
 5. **Simulate a Sighting & Disburse:** Test a finder claim or scan the pet in the **Clinic Portal**. As the owner, click **Confirm & Pay SOL** to trigger the Anchor smart contract payout and watch the confetti fly.
-6. **Audit the Cryptographic Spines:** Open **Trust Audit** and run the 4 live falsification probes to test state boundary invariants and unauthorized drain rejection.
+6. **Track Guardian Badges:** Open **Badges & Impact** to see your unlocked on-chain achievements and the collective network impact metrics.
+7. **Audit the Cryptographic Spines:** Open **Trust Audit** and run the 4 live falsification probes to test state boundary invariants and unauthorized drain rejection.
 
 ---
 
@@ -81,7 +84,7 @@ pub mod chainpaws {
 
 ## 🛠️ How I Built It
 
-Next.js 14 (App Router), TypeScript, Vanilla CSS design tokens with Tailwind utilities, Leaflet OpenStreetMap, and `@solana/web3.js` connected to Solana Devnet.
+Next.js 14 (App Router), TypeScript, Vanilla CSS design tokens with Tailwind utilities, Leaflet OpenStreetMap, Web Speech Synthesis API, and `@solana/web3.js` connected to Solana Devnet.
 
 ### 1. Solana as the Single Source of Truth (Zero Centralized Database)
 Like all true Web3 protocols, **the blockchain is the database**. There is no Postgres, Mongo, or Firebase backend. The application derives its entire state from deterministic Program Derived Accounts (PDAs):
@@ -171,6 +174,7 @@ ALL 4 SOLANA PROTOCOL TESTS PASSED DETERMINISTICALLY!
 - **Zero-Database Architecture:** The Solana blockchain serves as the single source of truth for pet identities, status transitions, and claims.
 - **SPL Memo Program Integration:** Permanent, human-readable on-chain ledger auditability.
 - **Real RPC & Wallet Adapter Integration:** Live Devnet balance querying, faucet airdrops, Phantom/Solflare wallet transactions, and sub-second confirmation.
+- **Guardian Badges & Collective Rescue Network:** Gamified on-chain milestone tracking and macro community rescue impact metrics.
 
 ---
 

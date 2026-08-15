@@ -9,9 +9,11 @@ import { RegisterPetView } from '@/components/views/RegisterPetView';
 import { OwnerConsoleView } from '@/components/views/OwnerConsoleView';
 import { ClinicPortalView } from '@/components/views/ClinicPortalView';
 import { TrustInspectorView } from '@/components/views/TrustInspectorView';
+import { GuardianBadgesView } from '@/components/views/GuardianBadgesView';
 import { ClaimModal } from '@/components/modals/ClaimModal';
 import { BountyModal } from '@/components/modals/BountyModal';
 import { QrTagModal } from '@/components/modals/QrTagModal';
+import { EmergencyFlyerModal } from '@/components/modals/EmergencyFlyerModal';
 import { ToastContainer } from '@/components/ui/Toast';
 import { INITIAL_PETS, INITIAL_CLINICS, INITIAL_TX_HISTORY, DEMO_WALLET_PUBKEY } from '@/lib/mockData';
 import { PetRecord, ClinicRecord, TxHistoryItem, ClaimRecord, ToastMessage } from '@/types';
@@ -34,18 +36,19 @@ export default function Home() {
   const [selectedClaimPet, setSelectedClaimPet] = useState<PetRecord | null>(null);
   const [selectedBountyPet, setSelectedBountyPet] = useState<PetRecord | null>(null);
   const [selectedQrPet, setSelectedQrPet] = useState<PetRecord | null>(null);
+  const [selectedFlyerPet, setSelectedFlyerPet] = useState<PetRecord | null>(null);
 
-  // Load / Sync state from localStorage on mount if present (v6 populated dataset)
+  // Load / Sync state from localStorage on mount if present (v7 clean key)
   useEffect(() => {
     try {
-      const savedPets = localStorage.getItem('chainpaws_pets_v6');
+      const savedPets = localStorage.getItem('chainpaws_pets_v7');
       if (savedPets) {
         const parsed = JSON.parse(savedPets);
         if (Array.isArray(parsed) && parsed.length >= INITIAL_PETS.length) {
           setPets(parsed);
         }
       }
-      const savedTx = localStorage.getItem('chainpaws_txs_v6');
+      const savedTx = localStorage.getItem('chainpaws_txs_v7');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
     } catch {}
   }, []);
@@ -53,8 +56,8 @@ export default function Home() {
   // Save to localStorage when state changes
   useEffect(() => {
     try {
-      localStorage.setItem('chainpaws_pets_v6', JSON.stringify(pets));
-      localStorage.setItem('chainpaws_txs_v6', JSON.stringify(txHistory));
+      localStorage.setItem('chainpaws_pets_v7', JSON.stringify(pets));
+      localStorage.setItem('chainpaws_txs_v7', JSON.stringify(txHistory));
     } catch {}
   }, [pets, txHistory]);
 
@@ -222,6 +225,7 @@ export default function Home() {
             pets={pets}
             onOpenClaimModal={(pet) => setSelectedClaimPet(pet)}
             onOpenQrModal={(pet) => setSelectedQrPet(pet)}
+            onOpenFlyerModal={(pet) => setSelectedFlyerPet(pet)}
             onNavigateRegister={() => setActiveTab('register')}
           />
         )}
@@ -243,6 +247,14 @@ export default function Home() {
             onAddTxHistory={handleAddTxHistory}
             onNavigateRegister={() => setActiveTab('register')}
             demoWalletPubkey={DEMO_WALLET_PUBKEY}
+          />
+        )}
+
+        {activeTab === 'badges' && (
+          <GuardianBadgesView
+            pets={pets}
+            txHistory={txHistory}
+            onNavigateTab={(tab) => setActiveTab(tab)}
           />
         )}
 
@@ -282,6 +294,13 @@ export default function Home() {
         <QrTagModal
           pet={selectedQrPet}
           onClose={() => setSelectedQrPet(null)}
+        />
+      )}
+
+      {selectedFlyerPet && (
+        <EmergencyFlyerModal
+          pet={selectedFlyerPet}
+          onClose={() => setSelectedFlyerPet(null)}
         />
       )}
 

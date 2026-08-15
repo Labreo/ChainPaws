@@ -12,6 +12,7 @@ import {
   Terminal,
   Droplet,
   Coins,
+  Award,
 } from 'lucide-react';
 import { requestDevnetAirdrop, getSolBalance } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
@@ -93,6 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'radar', label: 'Live Map & Alerts', icon: Radio, count: missingCount > 0 ? missingCount : null },
     { id: 'register', label: 'Register Pet', icon: PlusCircle },
     { id: 'mypets', label: 'My Pets', icon: ShieldCheck },
+    { id: 'badges', label: 'Badges & Impact', icon: Award },
     { id: 'clinic', label: 'Clinic Portal', icon: Building2 },
     { id: 'trust', label: 'Trust Audit', icon: Terminal },
   ];
@@ -130,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={id}
                   onClick={() => { setActiveTab(id); playSound('click'); }}
-                  className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
                     isActive
                       ? 'text-[#080c14] bg-[#2ec4b6] shadow-sm font-bold'
                       : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'

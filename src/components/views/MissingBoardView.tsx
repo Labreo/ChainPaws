@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   Map as MapIcon,
   ShieldCheck,
+  FileText,
+  Volume2,
+  Share2,
 } from 'lucide-react';
 import { PetRecord } from '@/types';
 import { shortenAddress, getExplorerAddressUrl } from '@/lib/solana/pda';
@@ -35,6 +38,7 @@ interface MissingBoardViewProps {
   pets: PetRecord[];
   onOpenClaimModal: (pet: PetRecord) => void;
   onOpenQrModal: (pet: PetRecord) => void;
+  onOpenFlyerModal: (pet: PetRecord) => void;
   onNavigateRegister: () => void;
 }
 
@@ -42,6 +46,7 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
   pets,
   onOpenClaimModal,
   onOpenQrModal,
+  onOpenFlyerModal,
   onNavigateRegister,
 }) => {
   const [speciesFilter, setSpeciesFilter] = useState<'all' | 'dog' | 'cat'>('all');
@@ -395,14 +400,23 @@ export const MissingBoardView: React.FC<MissingBoardViewProps> = ({
                 </div>
 
                 {/* Footer Action Buttons */}
-                <div className="px-6 pb-6 pt-1 flex items-center gap-2.5">
+                <div className="px-6 pb-6 pt-1 flex items-center gap-2">
                   {isMissing ? (
-                    <button
-                      onClick={() => { onOpenClaimModal(pet); playSound('click'); }}
-                      className="btn-danger flex-1 text-xs py-2.5 shadow-md"
-                    >
-                      I Found {pet.name}
-                    </button>
+                    <>
+                      <button
+                        onClick={() => { onOpenClaimModal(pet); playSound('click'); }}
+                        className="btn-danger flex-1 text-xs py-2.5 shadow-md"
+                      >
+                        I Found {pet.name}
+                      </button>
+                      <button
+                        onClick={() => { onOpenFlyerModal(pet); playSound('click'); }}
+                        title="AI Emergency Bulletin & Voice Broadcast"
+                        className="btn-ghost p-2.5 rounded-xl text-red-400 border-red-500/30 hover:border-red-500/60"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </button>
+                    </>
                   ) : (
                     <div className="flex-1 py-2.5 px-3 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-400 text-xs font-semibold text-center"
                          style={{ fontFamily: 'Montserrat, sans-serif' }}>
