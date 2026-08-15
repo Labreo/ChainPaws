@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PetRecord } from '@/types';
 import { playSound } from '@/lib/sound';
-import { MapPin, Navigation, Compass, ZoomIn, ZoomOut, CheckCircle2 } from 'lucide-react';
+import { Compass, ZoomIn, ZoomOut, CheckCircle2, Radio, Filter } from 'lucide-react';
 
 interface PetDiscoveryMapProps {
   pets: PetRecord[];
@@ -18,6 +18,8 @@ const CITY_COORDINATES: Record<string, { lat: number; lng: number; zoom: number;
   Austin: { lat: 30.2672, lng: -97.7431, zoom: 13, name: 'Austin, TX' },
   Seattle: { lat: 47.6062, lng: -122.3321, zoom: 13, name: 'Seattle, WA' },
   'New York': { lat: 40.7829, lng: -73.9654, zoom: 13, name: 'New York, NY' },
+  Chicago: { lat: 41.8781, lng: -87.6298, zoom: 13, name: 'Chicago, IL' },
+  Miami: { lat: 25.7617, lng: -80.1918, zoom: 13, name: 'Miami, FL' },
 };
 
 export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
@@ -31,8 +33,13 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
 
   const [selectedCity, setSelectedCity] = useState<string>('San Francisco');
   const [mapStyle, setMapStyle] = useState<'carto_voyager' | 'carto_dark' | 'osm'>('carto_voyager');
+  const [mapSpeciesFilter, setMapSpeciesFilter] = useState<'all' | 'dog' | 'cat'>('all');
 
-  const missingPets = pets.filter((p) => p.status === 'missing' && p.lat && p.lng);
+  const missingPets = pets.filter((p) => {
+    if (p.status !== 'missing' || !p.lat || !p.lng) return false;
+    if (mapSpeciesFilter !== 'all' && p.species !== mapSpeciesFilter) return false;
+    return true;
+  });
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -60,7 +67,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         attributionControl: false,
       });
 
-      // Add custom Tile Layer
+      // Tile URLs
       const tileUrls = {
         carto_voyager: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
         carto_dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -78,7 +85,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
       mapInstanceRef.current = map;
       renderMarkers(L, map);
 
-      // Ensure proper sizing after DOM render
+      // Invalidate size after layout
       setTimeout(() => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.invalidateSize();
@@ -95,7 +102,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         mapInstanceRef.current = null;
       }
     };
-  }, [mapStyle]);
+  }, [mapStyle, mapSpeciesFilter]);
 
   // Render Pet Markers on Map
   const renderMarkers = (L: any, map: any) => {
@@ -106,17 +113,19 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
     missingPets.forEach((pet) => {
       if (!pet.lat || !pet.lng) return;
 
-      const fallbackImg = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80';
+      const fallbackImg = pet.species === 'cat'
+        ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80'
+        : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80';
       const imgSrc = pet.imageUrl || fallbackImg;
 
-      // Custom HTML Marker Pin
+      // Custom HTML Marker Pin with active radar pulse
       const customIcon = L.divIcon({
         className: 'pet-pin-marker',
-        iconSize: [44, 44],
-        iconAnchor: [22, 22],
-        popupAnchor: [0, -26],
+        iconSize: [46, 46],
+        iconAnchor: [23, 23],
+        popupAnchor: [0, -28],
         html: `
-          <div class="pet-pin-bubble">
+          <div class="pet-pin-bubble ${pet.medicalUrgent ? 'pulse-urgent' : ''}">
             <img src="${imgSrc}" alt="${pet.name}" onerror="this.src='${fallbackImg}'" style="width:100%;height:100%;object-fit:cover;" />
             ${pet.bountySol > 0 ? `<div class="pet-pin-badge">${pet.bountySol} SOL</div>` : ''}
           </div>
@@ -130,7 +139,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
       popupContent.className = 'p-4 max-w-[280px] space-y-3';
       popupContent.innerHTML = `
         <div class="flex items-center gap-3">
-          <img src="${imgSrc}" alt="${pet.name}" onerror="this.src='${fallbackImg}'" style="width:48px;height:48px;border-radius:0.75rem;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);" />
+          <img src="${imgSrc}" alt="${pet.name}" onerror="this.src='${fallbackImg}'" style="width:48px;height:48px;border-radius:0.75rem;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);" />
           <div>
             <div style="font-family:Montserrat,sans-serif;font-weight:800;font-size:1rem;color:#fff;line-height:1.2;">
               ${pet.name}
@@ -153,7 +162,7 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
 
         ${pet.bountySol > 0 ? `
           <div style="background:rgba(244,162,97,0.15);border:1px solid rgba(244,162,97,0.3);padding:6px 10px;border-radius:0.625rem;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-family:Montserrat,sans-serif;font-size:0.7rem;font-weight:700;color:#f4a261;text-transform:uppercase;">Recovery Reward:</span>
+            <span style="font-family:Montserrat,sans-serif;font-size:0.7rem;font-weight:700;color:#f4a261;text-transform:uppercase;">Escrow Reward:</span>
             <span style="font-family:Montserrat,sans-serif;font-size:0.9rem;font-weight:900;color:#f4a261;">${pet.bountySol} SOL</span>
           </div>
         ` : ''}
@@ -222,46 +231,72 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
     }
   };
 
-  const cities = ['all', 'San Francisco', 'Los Angeles', 'Austin', 'Seattle', 'New York'];
+  const cities = ['all', 'San Francisco', 'Los Angeles', 'Austin', 'Seattle', 'New York', 'Chicago', 'Miami'];
 
   return (
     <div className="card p-5 sm:p-7 space-y-5" style={{ position: 'relative', zIndex: 1 }}>
 
       {/* Map Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <p className="label-eyebrow mb-1.5">Live Missing Pet Map</p>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <p className="label-eyebrow mb-0">Live Missing Pet Discovery Radar</p>
+          </div>
           <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
               style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            <span>Interactive Pet Recovery Map</span>
+            <span>Real-Time Recovery Map</span>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#2ec4b6]/10 border border-[#2ec4b6]/30 text-[#2ec4b6] font-mono font-bold">
-              {missingPets.length} Active Pins
+              {missingPets.length} Live Active Pins
             </span>
           </h3>
         </div>
 
-        {/* City Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#080c14] border border-white/[0.08] text-xs"
-             style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          {cities.map((city) => (
-            <button
-              key={city}
-              onClick={() => handleCitySelect(city)}
-              className={`px-3 py-1.5 rounded-lg font-semibold capitalize transition-all ${
-                selectedCity === city
-                  ? 'bg-[#2ec4b6] text-[#080c14] shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              {city === 'all' ? 'All Hubs' : city}
-            </button>
-          ))}
+        {/* Filters and City Selector */}
+        <div className="flex flex-wrap items-center gap-2">
+
+          {/* Quick Species Filter */}
+          <div className="flex items-center p-1 rounded-xl bg-[#080c14] border border-white/[0.08] text-xs"
+               style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            {(['all', 'dog', 'cat'] as const).map((sp) => (
+              <button
+                key={sp}
+                onClick={() => { setMapSpeciesFilter(sp); playSound('click'); }}
+                className={`px-2.5 py-1 rounded-lg font-semibold capitalize transition-all ${
+                  mapSpeciesFilter === sp
+                    ? 'bg-[#2ec4b6] text-[#080c14] shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {sp === 'all' ? 'All' : sp === 'dog' ? 'Dogs' : 'Cats'}
+              </button>
+            ))}
+          </div>
+
+          {/* City Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-[#080c14] border border-white/[0.08] text-xs"
+               style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            {cities.map((city) => (
+              <button
+                key={city}
+                onClick={() => handleCitySelect(city)}
+                className={`px-2.5 py-1 rounded-lg font-semibold capitalize transition-all ${
+                  selectedCity === city
+                    ? 'bg-[#2ec4b6] text-[#080c14] shadow-sm'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                }`}
+              >
+                {city === 'all' ? 'US Overview' : city}
+              </button>
+            ))}
+          </div>
+
         </div>
       </div>
 
-      {/* Real Map Canvas — Strictly Isolated with isolation: isolate */}
+      {/* Real Map Canvas */}
       <div
-        className="map-isolation-container relative w-full h-[400px] sm:h-[450px] border border-white/[0.1] shadow-2xl"
+        className="map-isolation-container relative w-full h-[420px] sm:h-[480px] border border-white/[0.1] shadow-2xl"
         style={{ isolation: 'isolate', position: 'relative', zIndex: 1, overflow: 'hidden' }}
       >
         {/* Leaflet DOM container */}
@@ -311,12 +346,12 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 pt-1">
         <div className="flex items-center gap-2 font-medium">
           <Compass className="w-4 h-4 text-[#2ec4b6]" />
-          <span>Click on any pet marker to view verified location details and submit an instant recovery claim.</span>
+          <span>Click any marker to view location details, verify microchip ID, and submit an instant recovery claim.</span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[11px]">
           <span className="text-emerald-400 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" />
-            OpenStreetMap Live Tiles
+            OpenStreetMap Verified Tiles
           </span>
           <span className="text-[#f4a261]">Solana Escrow Protected</span>
         </div>

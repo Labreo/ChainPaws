@@ -35,17 +35,17 @@ export default function Home() {
   const [selectedBountyPet, setSelectedBountyPet] = useState<PetRecord | null>(null);
   const [selectedQrPet, setSelectedQrPet] = useState<PetRecord | null>(null);
 
-  // Load / Sync state from localStorage on mount if present (v5 clean key)
+  // Load / Sync state from localStorage on mount if present (v6 populated dataset)
   useEffect(() => {
     try {
-      const savedPets = localStorage.getItem('chainpaws_pets_v5');
+      const savedPets = localStorage.getItem('chainpaws_pets_v6');
       if (savedPets) {
         const parsed = JSON.parse(savedPets);
         if (Array.isArray(parsed) && parsed.length >= INITIAL_PETS.length) {
           setPets(parsed);
         }
       }
-      const savedTx = localStorage.getItem('chainpaws_txs_v5');
+      const savedTx = localStorage.getItem('chainpaws_txs_v6');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
     } catch {}
   }, []);
@@ -53,8 +53,8 @@ export default function Home() {
   // Save to localStorage when state changes
   useEffect(() => {
     try {
-      localStorage.setItem('chainpaws_pets_v5', JSON.stringify(pets));
-      localStorage.setItem('chainpaws_txs_v5', JSON.stringify(txHistory));
+      localStorage.setItem('chainpaws_pets_v6', JSON.stringify(pets));
+      localStorage.setItem('chainpaws_txs_v6', JSON.stringify(txHistory));
     } catch {}
   }, [pets, txHistory]);
 
