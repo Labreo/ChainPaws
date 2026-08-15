@@ -170,18 +170,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Airdrop Faucet Button */}
-            <button
-              onClick={handleAirdrop}
-              disabled={isAirdropping}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#7c3aed]/15 border border-[#7c3aed]/30 hover:border-[#7c3aed]/60 text-[#a78bfa] hover:text-white text-xs font-semibold transition-all disabled:opacity-50"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
-              title="Request 1 Devnet SOL from faucet"
-            >
-              <Droplet className="w-3.5 h-3.5 text-[#a78bfa]" />
-              <span>{isAirdropping ? 'Airdropping...' : airdropMsg || '+1 SOL'}</span>
-            </button>
-
             {/* Custom Wallet Button */}
             <div className="wallet-button-wrapper flex-shrink-0">
               <WalletMultiButton />

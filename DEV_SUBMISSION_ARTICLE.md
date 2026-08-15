@@ -56,7 +56,7 @@ Example: [![ChainPaws Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefa
 💻 **Solana Cluster:** Devnet  
 📜 **Program ID:** [`GnEv5qz2xufNJqsqbkBvmgAa6ByWEmnygN6zayJ1SD8h`](https://explorer.solana.com/address/GnEv5qz2xufNJqsqbkBvmgAa6ByWEmnygN6zayJ1SD8h?cluster=devnet)
 
-> **No real money required.** The app runs on Solana Devnet. You can grab free test SOL in 1 click using the built-in **"+1 SOL"** faucet button in the top navigation bar, or install [Phantom](https://phantom.app) / [Solflare](https://solflare.com) set to Devnet.
+> **You need a wallet to interact on-chain.** Install [Phantom](https://phantom.app) or [Solflare](https://solflare.com), switch it to **Devnet** (Settings → Developer Settings → Devnet), and grab free test SOL from [faucet.solana.com](https://faucet.solana.com). It's a test network — **no real money, no financial claims.**
 
 ---
 
@@ -280,7 +280,7 @@ When an animal is wandering near a busy road, waiting 15 minutes for block confi
 - **Custom Rust Anchor Smart Contract:** Full implementation of multi-seed deterministic PDAs, non-custodial escrow vaults, and state teardown rent refunds.
 - **Zero-Database Architecture:** The Solana blockchain serves as the single source of truth for identities, escrows, and claim handovers.
 - **SPL Memo Program Integration:** Permanent on-chain JSON records for public Explorer auditability.
-- **Native Wallet & RPC Layer:** Direct Devnet balance streaming, airdrop faucet integration, Phantom/Solflare adapter support, and deterministic cryptographic testing.
+- **Native Wallet & RPC Layer:** Direct Devnet balance streaming, Phantom/Solflare adapter support, and deterministic cryptographic testing.
 - **Guardian Badges & Collective Rescue Network:** Gamified on-chain achievement milestones and network-wide impact metrics.
 
 <!-- 
