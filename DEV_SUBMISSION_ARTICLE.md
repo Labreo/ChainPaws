@@ -63,28 +63,28 @@ Example: [![ChainPaws Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefa
 ### 📸 Screenshots & Feature Walkthrough
 
 #### 1. Live OpenStreetMap Missing Pet Radar
-![ChainPaws Live Missing Pet Discovery Map showing real-time OpenStreetMap tiles with custom pet marker pins, active city navigators, and pulsing alert rings across metropolitan hubs]([REPLACE_WITH_SCREENSHOT_1_URL_OR_MAP_IMAGE])
+![ChainPaws Live Missing Pet Discovery Map showing real-time OpenStreetMap tiles with custom pet marker pins, active city navigators, and pulsing alert rings across metropolitan hubs](https://raw.githubusercontent.com/Labreo/ChainPaws/main/images/Live%20OpenStreetMap_Missing_Pet_Radar.png)
 
 *Real-time street map rendering OpenStreetMap tiles with animated pulse rings for medical-urgency alerts, city `flyTo` camera transitions, and instant on-map sighting claims.*
 
 ---
 
 #### 2. AI Multilingual Emergency Flyer & Voice Siren Broadcast
-![ChainPaws Multilingual Emergency Flyer Generator featuring high-contrast layout, ISO microchip QR tag, and 5-language translation switcher with browser speech siren]([REPLACE_WITH_SCREENSHOT_2_URL_OR_FLYER_IMAGE])
+![ChainPaws Multilingual Emergency Flyer Generator featuring high-contrast layout, ISO microchip QR tag, and 5-language translation switcher with browser speech siren](https://raw.githubusercontent.com/Labreo/ChainPaws/main/images/AI%20Multilingual%20Emergency%20Flyer%20%26%20Voice%20Siren.png)
 
 *Generate high-visibility printable flyers with instant translations into 5 languages and trigger an audible voice siren broadcast for on-the-ground search teams.*
 
 ---
 
 #### 3. Owner Escrow Vault Console & Bounty Settlement
-![ChainPaws Owner Console showing registered companions, active bounty escrow vaults, and one-click verified settlement payout]([REPLACE_WITH_SCREENSHOT_3_URL_OR_ESCROW_IMAGE])
+![ChainPaws Owner Console showing registered companions, active bounty escrow vaults, and one-click verified settlement payout](https://raw.githubusercontent.com/Labreo/ChainPaws/main/images/Owner%20Escrow%20Console%20%26%20Bounty%20Settlement.png)
 
 *Manage registered dogs, lock non-custodial SOL bounties, and release rewards directly to finders with zero administrative intermediary fees.*
 
 ---
 
 #### 4. Guardian Badges & Collective Rescue Network
-![ChainPaws Guardian Badges and Collective Rescue Impact Network showing total SOL escrowed, verified safe reunifications, and unlocked on-chain achievements]([REPLACE_WITH_SCREENSHOT_4_URL_OR_BADGES_IMAGE])
+![ChainPaws Guardian Badges and Collective Rescue Impact Network showing total SOL escrowed, verified safe reunifications, and unlocked on-chain achievements](https://raw.githubusercontent.com/Labreo/ChainPaws/main/images/Guardian%20Badges%20%26%20Collective%20Rescue%20Impact.png)
 
 *Every registration, sighting report, and verified reunion unlocks permanent Guardian Badges while contributing to global community rescue metrics.*
 
