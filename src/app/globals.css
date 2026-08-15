@@ -89,13 +89,18 @@
 
 /* Wallet Adapter Custom Dark Theme Override */
 .wallet-adapter-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   background-color: #00F3FF !important;
   color: #080c14 !important;
   font-weight: 700 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8125rem !important;
   border-radius: 0.75rem !important;
-  height: 2.5rem !important;
-  padding: 0 1.25rem !important;
+  height: 2.375rem !important;
+  padding: 0 1rem !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
   transition: all 0.2s ease !important;
   box-shadow: 0 0 15px rgba(0, 243, 255, 0.35) !important;
 }
