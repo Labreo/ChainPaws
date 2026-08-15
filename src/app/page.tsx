@@ -12,9 +12,11 @@ import { TrustInspectorView } from '@/components/views/TrustInspectorView';
 import { ClaimModal } from '@/components/modals/ClaimModal';
 import { BountyModal } from '@/components/modals/BountyModal';
 import { QrTagModal } from '@/components/modals/QrTagModal';
-import { INITIAL_PETS, INITIAL_CLINICS, INITIAL_TX_HISTORY } from '@/lib/mockData';
-import { PetRecord, ClinicRecord, TxHistoryItem, ClaimRecord } from '@/types';
+import { ToastContainer } from '@/components/ui/Toast';
+import { INITIAL_PETS, INITIAL_CLINICS, INITIAL_TX_HISTORY, DEMO_WALLET_PUBKEY } from '@/lib/mockData';
+import { PetRecord, ClinicRecord, TxHistoryItem, ClaimRecord, ToastMessage } from '@/types';
 import { reportLostTransaction } from '@/lib/solana/service';
+import { playSound } from '@/lib/sound';
 import { PublicKey } from '@solana/web3.js';
 
 export default function Home() {
@@ -25,6 +27,8 @@ export default function Home() {
   const [pets, setPets] = useState<PetRecord[]>(INITIAL_PETS);
   const [clinics, setClinics] = useState<ClinicRecord[]>(INITIAL_CLINICS);
   const [txHistory, setTxHistory] = useState<TxHistoryItem[]>(INITIAL_TX_HISTORY);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
 
   // Modals state
   const [selectedClaimPet, setSelectedClaimPet] = useState<PetRecord | null>(null);
@@ -34,9 +38,9 @@ export default function Home() {
   // Load / Sync state from localStorage on mount if present
   useEffect(() => {
     try {
-      const savedPets = localStorage.getItem('chainpaws_pets');
+      const savedPets = localStorage.getItem('chainpaws_pets_v2');
       if (savedPets) setPets(JSON.parse(savedPets));
-      const savedTx = localStorage.getItem('chainpaws_txs');
+      const savedTx = localStorage.getItem('chainpaws_txs_v2');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
     } catch {}
   }, []);
@@ -44,10 +48,22 @@ export default function Home() {
   // Save to localStorage when state changes
   useEffect(() => {
     try {
-      localStorage.setItem('chainpaws_pets', JSON.stringify(pets));
-      localStorage.setItem('chainpaws_txs', JSON.stringify(txHistory));
+      localStorage.setItem('chainpaws_pets_v2', JSON.stringify(pets));
+      localStorage.setItem('chainpaws_txs_v2', JSON.stringify(txHistory));
     } catch {}
   }, [pets, txHistory]);
+
+  const addToast = (toast: Omit<ToastMessage, 'id'>) => {
+    const id = `toast-${Date.now()}`;
+    setToasts((prev) => [...prev, { ...toast, id }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 6000);
+  };
+
+  const handleDismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const missingCount = pets.filter((p) => p.status === 'missing').length;
 
@@ -70,38 +86,66 @@ export default function Home() {
       petName: newPet.name,
       status: 'finalized',
     });
+    addToast({
+      type: 'success',
+      title: `🎉 ${newPet.name} Registered!`,
+      description: `Immutable PetRecord PDA created on Solana Devnet.`,
+      txSig,
+    });
   };
 
   const handleConfirmReportLost = async (petId: string, bountySol: number, location: string) => {
     const pet = pets.find((p) => p.id === petId);
-    if (!pet || !wallet.publicKey) return;
+    if (!pet) return;
 
-    const result = await reportLostTransaction(
-      connection,
-      wallet as any,
-      new PublicKey(pet.pdaAddress),
-      bountySol
-    );
+    let signature = '';
+    let escrowPdaAddress = '';
+    let isSimulated = false;
+
+    if (wallet.publicKey) {
+      const result = await reportLostTransaction(
+        connection,
+        wallet as any,
+        new PublicKey(pet.pdaAddress),
+        bountySol
+      );
+      signature = result.signature;
+      escrowPdaAddress = result.escrowPdaAddress;
+      isSimulated = result.isSimulated;
+    } else {
+      signature = `5K2eB8uY1k9bLmNpRqTsVwXzAcEfGhIjKlMnOpQrStUvWxYz${Math.floor(Math.random() * 1000000)}`;
+      escrowPdaAddress = '6JAPUGJ5emxfDTqJS7rAd98BQkGN5Lg1VGygengfWphB';
+      isSimulated = true;
+    }
 
     const updated: PetRecord = {
       ...pet,
       status: 'missing',
       bountySol,
-      bountyEscrowPda: result.escrowPdaAddress,
+      bountyEscrowPda: escrowPdaAddress,
       lastSeenLocation: location,
       lastSeenDate: 'Just now',
+      timeElapsed: 'Just now',
     };
 
+    playSound('lock');
     handleUpdatePet(updated);
     handleAddTxHistory({
       id: `tx-${Date.now()}`,
-      signature: result.signature,
+      signature,
       type: 'report_lost',
       description: `Locked ${bountySol} SOL in Escrow PDA for ${pet.name} (Missing Alert)`,
       timestamp: Date.now(),
       petName: pet.name,
       amountSol: bountySol,
-      status: result.isSimulated ? 'simulated' : 'finalized',
+      status: isSimulated ? 'simulated' : 'finalized',
+    });
+
+    addToast({
+      type: 'warning',
+      title: `🚨 Missing Alert: ${pet.name}`,
+      description: `Locked ${bountySol} SOL in Escrow Vault. Broadcast live on Radar.`,
+      txSig: signature,
     });
   };
 
@@ -124,7 +168,14 @@ export default function Home() {
       claims: [newClaim, ...(pet.claims || [])],
     };
 
+    playSound('success');
     handleUpdatePet(updated);
+
+    addToast({
+      type: 'info',
+      title: `🎯 Sighting Claim Submitted!`,
+      description: `Finder report submitted for ${pet.name}. Owner can verify & disburse bounty.`,
+    });
   };
 
   const handleAirdropSuccess = (sig: string) => {
@@ -137,10 +188,16 @@ export default function Home() {
       amountSol: 1.0,
       status: 'finalized',
     });
+    addToast({
+      type: 'success',
+      title: 'Devnet Faucet Airdrop Confirmed',
+      description: '+1.0 SOL credited for gas & escrow bounty deposits.',
+      txSig: sig,
+    });
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between">
+    <div className="flex-1 flex flex-col justify-between min-h-screen">
       
       {/* Top Navigation */}
       <Navbar
@@ -148,6 +205,9 @@ export default function Home() {
         setActiveTab={setActiveTab}
         onAirdropSuccess={handleAirdropSuccess}
         missingCount={missingCount}
+        demoWalletPubkey={DEMO_WALLET_PUBKEY}
+        isDemoMode={isDemoMode}
+        setIsDemoMode={setIsDemoMode}
       />
 
       {/* Main Content Area */}
@@ -165,6 +225,7 @@ export default function Home() {
           <RegisterPetView
             onPetRegistered={handlePetRegistered}
             onOpenQrModal={(pet) => setSelectedQrPet(pet)}
+            demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
         )}
 
@@ -176,6 +237,7 @@ export default function Home() {
             onUpdatePet={handleUpdatePet}
             onAddTxHistory={handleAddTxHistory}
             onNavigateRegister={() => setActiveTab('register')}
+            demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
         )}
 
@@ -185,6 +247,7 @@ export default function Home() {
             clinics={clinics}
             onOpenClaimModal={(pet) => setSelectedClaimPet(pet)}
             onOpenQrModal={(pet) => setSelectedQrPet(pet)}
+            demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
         )}
 
@@ -216,6 +279,9 @@ export default function Home() {
           onClose={() => setSelectedQrPet(null)}
         />
       )}
+
+      {/* Toast Notification Layer */}
+      <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />
 
       {/* Global Footer */}
       <Footer />

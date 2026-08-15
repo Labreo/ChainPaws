@@ -18,9 +18,13 @@ export interface PetRecord {
   bountySol: number;
   bountyEscrowPda?: string;
   lastSeenLocation?: string;
+  city?: string;
   lastSeenDate?: string;
+  timeElapsed?: string;
   distinctiveFeatures?: string;
   contactNote?: string;
+  medicalUrgent?: boolean;
+  coordinates?: { x: number; y: number }; // Radar percentage coordinates (0 to 100)
   createdAt: number;
   qrCodeUrl?: string;
   claims?: ClaimRecord[];
@@ -67,4 +71,12 @@ export interface FalsificationProbe {
   status: 'idle' | 'running' | 'passed' | 'failed';
   details?: string;
   log?: string[];
+}
+
+export interface ToastMessage {
+  id: string;
+  type: 'success' | 'info' | 'warning' | 'error';
+  title: string;
+  description: string;
+  txSig?: string;
 }
