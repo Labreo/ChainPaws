@@ -34,7 +34,6 @@ ChainPaws turns the lost-and-found experience into a transparent, cryptographic 
 - 📢 **AI Multilingual Emergency Bulletin & Voice Siren:** Generates printable high-visibility emergency flyers translated dynamically into 5 languages (*English, Español, Français, 中文, 日本語*) with an integrated browser audio voice siren for neighborhood search parties.
 - 🏥 **Veterinary & Shelter Clinic Terminal:** Dedicated RFID microchip scanner and NFC smart collar interface enabling registered veterinary clinics to verify lost pets and execute authorized handovers.
 - 🏆 **Guardian Badges & Collective Rescue Impact:** A gamified on-chain milestone network (*Guardian Genesis, Bounty Sentinel, First Responder, Reunion Champion, Licensed Clinic Node*) celebrating every life saved.
-- 🧪 **Trust & Falsification Audit Console:** An interactive developer/judge testing terminal to run live cryptographic falsification probes against smart contract state invariants in real time.
 
 **The goal:** Ensure no pet parent ever gets scammed while searching for their best friend, and give good Samaritans the cryptographic confidence that their rescue efforts will be honored instantly.
 
@@ -97,7 +96,7 @@ Example: [![ChainPaws Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefa
 3. **Generate an Emergency Flyer:** Open any missing pet card, tap the **Flyer** icon, switch between *English, Español, Français, 中文, 日本語*, and press **Play Voice Siren** to hear the audible alert.
 4. **Lock an Escrow Bounty:** In **My Pets**, click **Report Missing & Lock Reward**, and lock 1.5 SOL into the non-custodial smart escrow vault.
 5. **Verify Recovery & Disburse:** Test a finder claim or scan the pet in the **Clinic Portal**. As the owner, click **Confirm & Pay SOL** to disburse the bounty directly to the finder's wallet with celebration confetti!
-6. **Audit Invariants:** Open the **Trust Audit** tab to run 4 cryptographic falsification probes proving that unauthorized wallets cannot drain escrow vaults.
+6. **Track Rescue Milestones:** Open the **Badges** tab to view your unlocked on-chain achievements and network-wide recovery impact metrics.
 
 ---
 

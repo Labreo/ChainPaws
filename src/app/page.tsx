@@ -8,7 +8,6 @@ import { MissingBoardView } from '@/components/views/MissingBoardView';
 import { RegisterPetView } from '@/components/views/RegisterPetView';
 import { OwnerConsoleView } from '@/components/views/OwnerConsoleView';
 import { ClinicPortalView } from '@/components/views/ClinicPortalView';
-import { TrustInspectorView } from '@/components/views/TrustInspectorView';
 import { GuardianBadgesView } from '@/components/views/GuardianBadgesView';
 import { ClaimModal } from '@/components/modals/ClaimModal';
 import { BountyModal } from '@/components/modals/BountyModal';
@@ -266,10 +265,6 @@ export default function Home() {
             onOpenQrModal={(pet) => setSelectedQrPet(pet)}
             demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
-        )}
-
-        {activeTab === 'trust' && (
-          <TrustInspectorView txHistory={txHistory} />
         )}
       </main>
 

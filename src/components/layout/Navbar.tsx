@@ -9,7 +9,6 @@ import {
   PlusCircle,
   ShieldCheck,
   Building2,
-  Terminal,
   Coins,
   Award,
 } from 'lucide-react';
@@ -69,7 +68,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'mypets', label: 'My Pets', icon: ShieldCheck },
     { id: 'badges', label: 'Badges', icon: Award },
     { id: 'clinic', label: 'Clinic Portal', icon: Building2 },
-    { id: 'trust', label: 'Trust Audit', icon: Terminal },
   ];
 
   return (
