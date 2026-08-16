@@ -2,7 +2,7 @@
 title: ChainPaws — Stopping Lost Pet Scams with Solana Escrow & Tamper-Proof Registries 🐕🐾
 published: true
 tags: weekendchallenge, solana, web3, showdev
-cover_image: [REPLACE_WITH_COVER_IMAGE_URL_OR_LEAVE_BLANK]
+cover_image: https://raw.githubusercontent.com/Labreo/ChainPaws/main/images/Live%20OpenStreetMap_Missing_Pet_Radar.png
 ---
 
 *This is a submission for [Weekend Challenge: Dog Days Edition](https://dev.to/challenges/weekend-2026-08-13)*
@@ -41,15 +41,9 @@ ChainPaws turns the lost-and-found experience into a transparent, cryptographic 
 
 ## 🎬 Demo
 
-<!-- 
-DEMO VIDEO PLACEHOLDER:
-Embed your 2-minute YouTube / Loom video below.
-Example: [![ChainPaws Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
--->
+{% youtube B7q6M3ctP84 %}
 
-[![ChainPaws Demo Video](https://img.youtube.com/vi/[REPLACE_WITH_YOUTUBE_VIDEO_ID]/maxresdefault.jpg)]([REPLACE_WITH_YOUTUBE_OR_LOOM_VIDEO_URL])
-
-*Video Link:* [Watch 2-Minute Demo Walkthrough]([REPLACE_WITH_YOUTUBE_OR_LOOM_VIDEO_URL])
+*Video Link:* [Watch 2-Minute Demo Walkthrough on YouTube](https://youtu.be/B7q6M3ctP84)
 
 🌐 **Live Application:** [https://chain-paws.vercel.app](https://chain-paws.vercel.app)  
 💻 **Solana Cluster:** Devnet  
