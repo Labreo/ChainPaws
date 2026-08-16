@@ -106,8 +106,25 @@ export const Footer: React.FC = () => {
 
         <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
           <p>© 2026 ChainPaws Protocol. Built for Solana Devnet.</p>
-          <div className="flex items-center space-x-1 text-slate-400">
-            <span>Non-custodial companion protection.</span>
+          <div className="flex items-center space-x-4 text-slate-400">
+            <a
+              href="https://github.com/Labreo/ChainPaws"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#2ec4b6] transition-colors inline-flex items-center gap-1"
+            >
+              <span>GitHub</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://dev.to/kakeroth/chainpaws-stopping-lost-pet-scams-with-solana-escrow-tamper-proof-registries-54h2"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#2ec4b6] transition-colors inline-flex items-center gap-1"
+            >
+              <span>DEV Submission</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
       </div>

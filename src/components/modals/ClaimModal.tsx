@@ -14,13 +14,17 @@ interface ClaimModalProps {
 
 export const ClaimModal: React.FC<ClaimModalProps> = ({ pet, onClose, onSubmitClaim }) => {
   const { publicKey } = useWallet();
-  const [finderAddress, setFinderAddress] = useState(publicKey?.toBase58() || '');
+  const [finderAddress, setFinderAddress] = useState(publicKey?.toBase58() || 'QWs7k1ravPgCC959qdS9KpKJajjnY5usKYNMebg5L8M');
   const [finderName, setFinderName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
-  const [foundLocation, setFoundLocation] = useState('');
+  const [foundLocation, setFoundLocation] = useState(pet?.city ? `Near ${pet.city}` : '');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (publicKey) setFinderAddress(publicKey.toBase58());
+  }, [publicKey]);
 
   if (!pet) return null;
 

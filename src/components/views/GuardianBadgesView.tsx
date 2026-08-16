@@ -10,7 +10,7 @@ import {
   Lock,
   Radio,
   Building2,
-  Terminal,
+  Sparkles,
   ExternalLink,
   Flame,
   HeartHandshake,
@@ -82,13 +82,13 @@ export const GuardianBadgesView: React.FC<GuardianBadgesViewProps> = ({
       color: 'from-blue-500/20 to-blue-500/5 border-blue-500/40 text-blue-400',
     },
     {
-      id: 'badge-auditor',
-      name: 'Cryptographic Auditor',
-      category: 'Security',
-      icon: Terminal,
-      description: 'Executed state boundary and falsification invariant probes.',
+      id: 'badge-beacon',
+      name: 'Emergency Beacon Master',
+      category: 'Alert & AI',
+      icon: Sparkles,
+      description: 'Mobilized search parties with Google AI translations and acoustic voice sirens.',
       isUnlocked: true,
-      color: 'from-purple-500/20 to-purple-500/5 border-purple-500/40 text-purple-400',
+      color: 'from-amber-500/20 to-amber-500/5 border-amber-500/40 text-amber-400',
     },
   ];
 

@@ -102,7 +102,18 @@ export const PetDiscoveryMap: React.FC<PetDiscoveryMapProps> = ({
         mapInstanceRef.current = null;
       }
     };
-  }, [mapStyle, mapSpeciesFilter]);
+  }, [mapStyle]);
+
+  // Dynamically re-render markers whenever pets or filters change
+  useEffect(() => {
+    if (mapInstanceRef.current && typeof window !== 'undefined') {
+      import('leaflet').then((L) => {
+        if (mapInstanceRef.current) {
+          renderMarkers(L, mapInstanceRef.current);
+        }
+      });
+    }
+  }, [pets, mapSpeciesFilter]);
 
   // Render Pet Markers on Map
   const renderMarkers = (L: any, map: any) => {
