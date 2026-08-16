@@ -11,9 +11,11 @@ import {
   Building2,
   Coins,
   Award,
+  User,
 } from 'lucide-react';
 import { getSolBalance } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
+import { UserProfile } from '@/types';
 
 const WalletMultiButton = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -28,12 +30,16 @@ interface NavbarProps {
   demoWalletPubkey: string;
   isDemoMode: boolean;
   setIsDemoMode: (val: boolean) => void;
+  currentUser: UserProfile | null;
+  onOpenAuthModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   missingCount,
+  currentUser,
+  onOpenAuthModal,
 }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -139,6 +145,36 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Coins className="w-3.5 h-3.5" />
                 <span>{solBalance.toFixed(2)} SOL</span>
               </div>
+            )}
+
+            {/* Guardian Profile / Sign In Button */}
+            {currentUser ? (
+              <button
+                onClick={() => { onOpenAuthModal(); playSound('click'); }}
+                className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-left transition-all cursor-pointer group"
+                title="View Guardian Profile"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#2ec4b6]/20 border border-[#2ec4b6]/40 flex items-center justify-center text-xs font-bold text-[#2ec4b6]">
+                  {currentUser.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="hidden sm:block">
+                  <div className="text-xs font-bold text-white group-hover:text-[#2ec4b6] transition-colors leading-tight">
+                    {currentUser.name.split(' ')[0]}
+                  </div>
+                  <div className="text-[9px] text-slate-400 font-mono capitalize">
+                    {currentUser.role === 'owner' ? 'Pet Parent' : currentUser.role === 'clinic' ? 'Vet Node' : 'Guardian'}
+                  </div>
+                </div>
+              </button>
+            ) : (
+              <button
+                onClick={() => { onOpenAuthModal(); playSound('click'); }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                <User className="w-3.5 h-3.5 text-[#2ec4b6]" />
+                <span className="hidden sm:inline">Sign In</span>
+              </button>
             )}
 
             {/* Custom Wallet Button */}

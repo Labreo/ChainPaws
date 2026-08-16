@@ -1,6 +1,41 @@
-import { PetRecord, ClinicRecord, TxHistoryItem } from '@/types';
+import { PetRecord, ClinicRecord, TxHistoryItem, UserProfile } from '@/types';
 
 export const DEMO_WALLET_PUBKEY = 'BzVL5uEoqfWxWEfL9RAkParhaY4yz9aE8GJK9aneYS7x';
+
+export const DEFAULT_USERS: UserProfile[] = [
+  {
+    id: 'user-alex',
+    name: 'Alex Mercer',
+    email: 'alex.guardian@chainpaws.io',
+    role: 'owner',
+    walletAddress: 'BzVL5uEoqfWxWEfL9RAkParhaY4yz9aE8GJK9aneYS7x',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    phone: '+1 (415) 555-0192',
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 30,
+  },
+  {
+    id: 'user-dr-sarah',
+    name: 'Dr. Sarah Chen, DVM',
+    email: 'sarah.chen@missionpethospital.com',
+    role: 'clinic',
+    clinicName: 'Mission Pet Hospital & Emergency Care',
+    clinicAddress: '720 Valencia St, San Francisco, CA',
+    walletAddress: 'Vet99xK8LmP4qRsTuVwXyZaBcDeFgHiJkLmNoPqRsTuV',
+    avatarUrl: 'https://images.unsplash.com/photo-1594824813589-f79a40552cf3?auto=format&fit=crop&w=200&q=80',
+    phone: '+1 (415) 555-0144',
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 120,
+  },
+  {
+    id: 'user-elena',
+    name: 'Elena Rostova',
+    email: 'elena.finder@solmail.xyz',
+    role: 'guardian',
+    walletAddress: 'QWs7k1ravPgCC959qdS9KpKJajjnY5usKYNMebg5L8M',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+    phone: '+1 (415) 555-0188',
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 15,
+  },
+];
 
 export const INITIAL_PETS: PetRecord[] = [
   // ═══════════════════════════════════════════════════════════════

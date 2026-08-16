@@ -13,9 +13,10 @@ import { ClaimModal } from '@/components/modals/ClaimModal';
 import { BountyModal } from '@/components/modals/BountyModal';
 import { QrTagModal } from '@/components/modals/QrTagModal';
 import { EmergencyFlyerModal } from '@/components/modals/EmergencyFlyerModal';
+import { AuthModal } from '@/components/modals/AuthModal';
 import { ToastContainer } from '@/components/ui/Toast';
-import { INITIAL_PETS, INITIAL_CLINICS, INITIAL_TX_HISTORY, DEMO_WALLET_PUBKEY } from '@/lib/mockData';
-import { PetRecord, ClinicRecord, TxHistoryItem, ClaimRecord, ToastMessage } from '@/types';
+import { INITIAL_PETS, INITIAL_CLINICS, INITIAL_TX_HISTORY, DEMO_WALLET_PUBKEY, DEFAULT_USERS } from '@/lib/mockData';
+import { PetRecord, ClinicRecord, TxHistoryItem, ClaimRecord, ToastMessage, UserProfile } from '@/types';
 import { reportLostTransaction } from '@/lib/solana/service';
 import { playSound } from '@/lib/sound';
 import { PublicKey } from '@solana/web3.js';
@@ -36,6 +37,10 @@ export default function Home() {
   const [selectedBountyPet, setSelectedBountyPet] = useState<PetRecord | null>(null);
   const [selectedQrPet, setSelectedQrPet] = useState<PetRecord | null>(null);
   const [selectedFlyerPet, setSelectedFlyerPet] = useState<PetRecord | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  // User Authentication State (Default to Alex Mercer / Loaded from Storage)
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(DEFAULT_USERS[0]);
 
   // Load / Sync state from localStorage on mount (v10 clean key)
   useEffect(() => {
@@ -54,6 +59,9 @@ export default function Home() {
       }
       const savedTx = localStorage.getItem('chainpaws_txs_v10');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
+
+      const savedUser = localStorage.getItem('chainpaws_user_v10');
+      if (savedUser) setCurrentUser(JSON.parse(savedUser));
     } catch {}
   }, []);
 
@@ -62,8 +70,31 @@ export default function Home() {
     try {
       localStorage.setItem('chainpaws_pets_v10', JSON.stringify(pets));
       localStorage.setItem('chainpaws_txs_v10', JSON.stringify(txHistory));
+      if (currentUser) {
+        localStorage.setItem('chainpaws_user_v10', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('chainpaws_user_v10');
+      }
     } catch {}
-  }, [pets, txHistory]);
+  }, [pets, txHistory, currentUser]);
+
+  const handleLogin = (user: UserProfile) => {
+    setCurrentUser(user);
+    addToast({
+      type: 'success',
+      title: `Welcome, ${user.name}!`,
+      description: `Signed in as ${user.role === 'owner' ? 'Pet Parent' : user.role === 'clinic' ? 'Veterinary Node' : 'Community Guardian'}.`,
+    });
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    addToast({
+      type: 'info',
+      title: 'Signed Out',
+      description: 'You have signed out of your Guardian profile.',
+    });
+  };
 
   const handleResetDemoState = () => {
     try {
@@ -239,6 +270,8 @@ export default function Home() {
         demoWalletPubkey={DEMO_WALLET_PUBKEY}
         isDemoMode={isDemoMode}
         setIsDemoMode={setIsDemoMode}
+        currentUser={currentUser}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -322,6 +355,15 @@ export default function Home() {
           onClose={() => setSelectedFlyerPet(null)}
         />
       )}
+
+      {/* Guardian Auth & Registration Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
 
       {/* Toast Notification Layer */}
       <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />

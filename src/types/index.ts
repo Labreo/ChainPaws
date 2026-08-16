@@ -82,3 +82,19 @@ export interface ToastMessage {
   description: string;
   txSig?: string;
 }
+
+export type UserRole = 'owner' | 'clinic' | 'guardian';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  walletAddress: string;
+  avatarUrl?: string;
+  clinicName?: string;
+  clinicAddress?: string;
+  phone?: string;
+  createdAt: number;
+}
+
