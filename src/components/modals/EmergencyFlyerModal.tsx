@@ -13,6 +13,7 @@ import {
   Clock,
   Sparkles,
   Loader2,
+  Activity,
 } from 'lucide-react';
 import { PetRecord } from '@/types';
 import { playSound } from '@/lib/sound';
@@ -40,7 +41,8 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
   stopVoiceButton: string;
   printButton: string;
   aiBadge: string;
-  speechText: (name: string, breed: string, city: string, reward: number) => string;
+  broadcastingLabel: string;
+  speechText: (name: string, breed: string, city: string, reward: number, medicalUrgent: boolean, features: string) => string;
 }> = {
   en: {
     headerTitle: 'AI EMERGENCY BULLETIN & VOICE BROADCAST',
@@ -58,8 +60,11 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
     stopVoiceButton: 'Stop Broadcast',
     printButton: 'Print Emergency Flyer',
     aiBadge: 'AI Multilingual Engine',
-    speechText: (name, breed, city, reward) =>
-      `Emergency missing companion alert. A ${breed} named ${name} was last seen in ${city}. A verified escrow reward of ${reward} SOL is locked on the Solana blockchain for their safe return. Please scan the QR tag or notify authorities immediately.`,
+    broadcastingLabel: 'Broadcasting emergency audio siren...',
+    speechText: (name, breed, city, reward, medicalUrgent, features) =>
+      `Emergency lost companion alert. ${name}, a ${breed}, is missing near ${city}. ${
+        medicalUrgent ? 'Critical medical alert: this companion requires daily essential medication. ' : ''
+      }Identifying traits: ${features}. A verified escrow bounty of ${reward} SOL is locked on the Solana blockchain for their safe recovery. Please scan the QR tag or notify authorities immediately.`,
   },
   es: {
     headerTitle: 'BOLETÍN DE EMERGENCIA IA Y DIFUSIÓN DE VOZ',
@@ -77,8 +82,11 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
     stopVoiceButton: 'Detener Emisión',
     printButton: 'Imprimir Cartel de Emergencia',
     aiBadge: 'Traducción Dinámica IA',
-    speechText: (name, breed, city, reward) =>
-      `Alerta de emergencia de mascota perdida. Un ${breed} llamado ${name} fue visto por última vez en ${city}. Hay una recompensa en custodia de ${reward} SOL en la cadena de bloques Solana para su regreso seguro.`,
+    broadcastingLabel: 'Transmitiendo sirena de voz de emergencia...',
+    speechText: (name, breed, city, reward, medicalUrgent, features) =>
+      `Alerta de emergencia de mascota perdida. ${name}, de raza ${breed}, está desaparecido cerca de ${city}. ${
+        medicalUrgent ? 'Alerta médica crítica: requiere medicación vital diaria. ' : ''
+      }Características: ${features}. Una recompensa en custodia de ${reward} SOL está bloqueada en la cadena de bloques Solana para su regreso seguro.`,
   },
   fr: {
     headerTitle: 'BULLETIN D\'URGENCE IA ET DIFFUSION VOCALE',
@@ -96,8 +104,11 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
     stopVoiceButton: 'Arrêter la Diffusion',
     printButton: 'Imprimer l\'Affiche d\'Urgence',
     aiBadge: 'Traduction Dynamique IA',
-    speechText: (name, breed, city, reward) =>
-      `Alerte d'urgence pour animal disparu. Un ${breed} nommé ${name} a été vu pour la dernière fois à ${city}. Une récompense de ${reward} SOL est bloquée sur la blockchain Solana pour son retour en toute sécurité.`,
+    broadcastingLabel: 'Diffusion de la sirène vocale d\'urgence...',
+    speechText: (name, breed, city, reward, medicalUrgent, features) =>
+      `Alerte d'urgence pour animal disparu. ${name}, un ${breed}, est porté disparu vers ${city}. ${
+        medicalUrgent ? 'Avis médical critique : cet animal nécessite son traitement médical quotidien. ' : ''
+      }Signes distinctifs : ${features}. Une récompense de ${reward} SOL est sécurisée sur la blockchain Solana pour son retour.`,
   },
   zh: {
     headerTitle: 'AI 紧急寻宠通告与语音广播',
@@ -115,8 +126,11 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
     stopVoiceButton: '停止广播',
     printButton: '打印紧急寻宠传单',
     aiBadge: 'AI 智能多语言翻译',
-    speechText: (name, breed, city, reward) =>
-      `紧急寻宠通知。名为${name}的${breed}在${city}走失。已在Solana区块链锁定${reward}个SOL智能合约悬赏金。请扫描芯片二维码或联系救援。`,
+    broadcastingLabel: '正在广播紧急语音警报...',
+    speechText: (name, breed, city, reward, medicalUrgent, features) =>
+      `紧急寻宠广播通知。名为${name}的${breed}在${city}走失。${
+        medicalUrgent ? '关键医疗警告：该宠物需要每日按时服用必要药物！' : ''
+      }外貌特征：${features}。已在Solana区块链锁定${reward}个SOL智能合约悬赏金。请扫描芯片二维码或通知救援。`,
   },
   ja: {
     headerTitle: 'AI 緊急捜索通告・音声ブロードキャスト',
@@ -134,8 +148,11 @@ const UI_TRANSLATIONS: Record<SupportedLanguage, {
     stopVoiceButton: '音声を停止',
     printButton: '緊急捜索チラシを印刷',
     aiBadge: 'AI リアルタイム自動翻訳',
-    speechText: (name, breed, city, reward) =>
-      `緊急迷子ペットアラート。${city}で迷子になった${breed}の${name}を探しています。Solana上で${reward}SOLの懸賞金が預託されています。見かけた方はQRスキャンをお願いします。`,
+    broadcastingLabel: '緊急音声サイレンを放送中...',
+    speechText: (name, breed, city, reward, medicalUrgent, features) =>
+      `緊急迷子ペットアラート。${city}付近で迷子になった${breed}の${name}を探しています。${
+        medicalUrgent ? '緊急医療警告：このペットは毎日の重要な投薬治療が不可欠です！' : ''
+      }特徴：${features}。Solanaブロックチェーン上に${reward}SOLのスマートコントラクト懸賞金が預託されています。見かけた方は至急QRコードをスキャンしてください。`,
   },
 };
 
@@ -216,8 +233,20 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
     }
 
     speechSynth.cancel();
+    
+    // 1. Play siren acoustic burst first
+    playSound('siren');
+
+    // 2. Queue synthesized voice broadcast with translated medical urgency and features
     const t = UI_TRANSLATIONS[lang];
-    const text = t.speechText(pet.name, pet.breed, pet.city || pet.lastSeenLocation || 'the area', pet.bountySol);
+    const text = t.speechText(
+      pet.name,
+      pet.breed,
+      pet.city || pet.lastSeenLocation || 'the area',
+      pet.bountySol,
+      !!pet.medicalUrgent,
+      translatedFeatures
+    );
     const utterance = new SpeechSynthesisUtterance(text);
     
     // Set appropriate language tag
@@ -227,9 +256,11 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
-    speechSynth.speak(utterance);
-    setIsSpeaking(true);
-    playSound('radar');
+    // Small delay so siren acoustic rings before speech begins
+    setTimeout(() => {
+      speechSynth.speak(utterance);
+      setIsSpeaking(true);
+    }, 450);
   };
 
   const handlePrint = () => {
@@ -374,6 +405,22 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
             </div>
           </div>
 
+          {/* Active Voice Siren Broadcast Banner */}
+          {isSpeaking && (
+            <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/50 flex items-center justify-between gap-3 text-red-300 animate-pulse">
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <Activity className="w-4 h-4 text-red-400 animate-spin" />
+                <span>{t.broadcastingLabel}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-4 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-6 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-5 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-1.5 h-7 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
+              </div>
+            </div>
+          )}
+
           {/* QR Footer */}
           <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white text-[#080c14]">
             <div className="space-y-1">
@@ -397,8 +444,8 @@ export const EmergencyFlyerModal: React.FC<EmergencyFlyerModalProps> = ({ pet, o
           {/* Voice Broadcast */}
           <button
             onClick={handleToggleVoiceAlert}
-            className={`btn-ghost text-xs py-2 px-4 flex items-center gap-2 cursor-pointer ${
-              isSpeaking ? 'border-red-500 text-red-400 bg-red-950/40' : ''
+            className={`btn-ghost text-xs py-2 px-4 flex items-center gap-2 cursor-pointer transition-all ${
+              isSpeaking ? 'border-red-500 text-red-400 bg-red-950/60 shadow-lg shadow-red-500/20' : ''
             }`}
           >
             {isSpeaking ? (

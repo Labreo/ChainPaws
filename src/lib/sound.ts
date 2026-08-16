@@ -1,7 +1,7 @@
 /**
- * Synthesized Web Audio API sound effects for futuristic UI haptics
+ * Synthesized Web Audio API sound effects for futuristic UI haptics & emergency siren
  */
-export function playSound(type: 'lock' | 'success' | 'click' | 'radar' | 'alert') {
+export function playSound(type: 'lock' | 'success' | 'click' | 'radar' | 'alert' | 'siren') {
   if (typeof window === 'undefined') return;
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -47,18 +47,27 @@ export function playSound(type: 'lock' | 'success' | 'click' | 'radar' | 'alert'
         osc.start(ctx.currentTime + i * 0.08);
         osc.stop(ctx.currentTime + i * 0.08 + 0.35);
       });
-    } else if (type === 'alert') {
+    } else if (type === 'siren' || type === 'alert') {
+      // Authentic high-low emergency search siren warble
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(320, ctx.currentTime);
-      osc.frequency.setValueAtTime(480, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      
+      const startTime = ctx.currentTime;
+      // Cycle high-low-high
+      osc.frequency.setValueAtTime(880, startTime);
+      osc.frequency.linearRampToValueAtTime(587.33, startTime + 0.2);
+      osc.frequency.linearRampToValueAtTime(880, startTime + 0.4);
+      osc.frequency.linearRampToValueAtTime(587.33, startTime + 0.6);
+      osc.frequency.linearRampToValueAtTime(880, startTime + 0.8);
+      
+      gain.gain.setValueAtTime(0.15, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.85);
+      
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
+      osc.start(startTime);
+      osc.stop(startTime + 0.85);
     } else if (type === 'radar') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
