@@ -269,7 +269,6 @@ export default function Home() {
             onUpdatePet={handleUpdatePet}
             onAddTxHistory={handleAddTxHistory}
             onNavigateRegister={() => setActiveTab('register')}
-            onResetDemo={handleResetDemoState}
             demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
         )}
