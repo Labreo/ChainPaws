@@ -37,17 +37,22 @@ export default function Home() {
   const [selectedQrPet, setSelectedQrPet] = useState<PetRecord | null>(null);
   const [selectedFlyerPet, setSelectedFlyerPet] = useState<PetRecord | null>(null);
 
-  // Load / Sync state from localStorage on mount if present (v7 clean key)
+  // Load / Sync state from localStorage on mount (v10 clean key)
   useEffect(() => {
     try {
-      const savedPets = localStorage.getItem('chainpaws_pets_v7');
+      // Clear legacy storage keys
+      for (let i = 1; i <= 9; i++) {
+        localStorage.removeItem(`chainpaws_pets_v${i}`);
+        localStorage.removeItem(`chainpaws_txs_v${i}`);
+      }
+      const savedPets = localStorage.getItem('chainpaws_pets_v10');
       if (savedPets) {
         const parsed = JSON.parse(savedPets);
         if (Array.isArray(parsed) && parsed.length >= INITIAL_PETS.length) {
           setPets(parsed);
         }
       }
-      const savedTx = localStorage.getItem('chainpaws_txs_v7');
+      const savedTx = localStorage.getItem('chainpaws_txs_v10');
       if (savedTx) setTxHistory(JSON.parse(savedTx));
     } catch {}
   }, []);
@@ -55,10 +60,29 @@ export default function Home() {
   // Save to localStorage when state changes
   useEffect(() => {
     try {
-      localStorage.setItem('chainpaws_pets_v7', JSON.stringify(pets));
-      localStorage.setItem('chainpaws_txs_v7', JSON.stringify(txHistory));
+      localStorage.setItem('chainpaws_pets_v10', JSON.stringify(pets));
+      localStorage.setItem('chainpaws_txs_v10', JSON.stringify(txHistory));
     } catch {}
   }, [pets, txHistory]);
+
+  const handleResetDemoState = () => {
+    try {
+      for (let i = 1; i <= 10; i++) {
+        localStorage.removeItem(`chainpaws_pets_v${i}`);
+        localStorage.removeItem(`chainpaws_txs_v${i}`);
+      }
+      localStorage.removeItem('chainpaws_pets');
+      localStorage.removeItem('chainpaws_txs');
+    } catch {}
+    setPets(INITIAL_PETS);
+    setTxHistory(INITIAL_TX_HISTORY);
+    playSound('success');
+    addToast({
+      type: 'success',
+      title: 'Demo State Restored',
+      description: 'Atlas is Missing with 1.50 SOL escrow locked and Elena’s sighting ready to settle!',
+    });
+  };
 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
     const id = `toast-${Date.now()}`;
@@ -245,6 +269,7 @@ export default function Home() {
             onUpdatePet={handleUpdatePet}
             onAddTxHistory={handleAddTxHistory}
             onNavigateRegister={() => setActiveTab('register')}
+            onResetDemo={handleResetDemoState}
             demoWalletPubkey={DEMO_WALLET_PUBKEY}
           />
         )}

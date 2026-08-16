@@ -28,6 +28,7 @@ interface OwnerConsoleViewProps {
   onUpdatePet: (updatedPet: PetRecord) => void;
   onAddTxHistory: (item: any) => void;
   onNavigateRegister: () => void;
+  onResetDemo?: () => void;
   demoWalletPubkey: string;
 }
 
@@ -38,6 +39,7 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
   onUpdatePet,
   onAddTxHistory,
   onNavigateRegister,
+  onResetDemo,
   demoWalletPubkey,
 }) => {
   const { connection } = useConnection();
@@ -163,13 +165,25 @@ export const OwnerConsoleView: React.FC<OwnerConsoleViewProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={() => { onNavigateRegister(); playSound('click'); }}
-          className="btn-primary flex-shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Register Another Pet
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          {onResetDemo && (
+            <button
+              onClick={() => { onResetDemo(); playSound('click'); }}
+              className="btn-ghost flex-shrink-0 text-xs text-slate-300 hover:text-white border-white/[0.1] hover:border-[#2ec4b6]/40"
+              title="Reset pet records & demo escrows to default"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-[#2ec4b6]" />
+              Reset Demo State
+            </button>
+          )}
+          <button
+            onClick={() => { onNavigateRegister(); playSound('click'); }}
+            className="btn-primary flex-shrink-0"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Register Another Pet
+          </button>
+        </div>
       </div>
 
       {/* ── Success Toast ── */}
